@@ -21,5 +21,6 @@
 [lit] [/lit]**Github**
 {dcpu16.js|https://github.com/dwilliamson/dcpu16.js} - DCPU-16 Assembler & Emulator
 {DCPU-16|https://github.com/dwilliamson/dwilliamson.github.com} - DCPU-16 browser live-edit
+{Gazoo.cpp|https://github.com/dwilliamson/b} - Repository for blog content
 
 [lit]</div>[/lit]
