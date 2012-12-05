@@ -7,15 +7,11 @@ function BlogEngine()
 		// Get window dimensions
 		var window_w = window.innerWidth;
 		var window_h = window.innerHeight;
-		var window_t = window.pageYOffset;
-		var window_l = window.pageXOffset;
 
 		// Setup the semi-transparent background that should cover the entire image
-		$("#image_background")
-			.css("top", window_t)
-			.css("left", window_l)
-			.css("width", window_w)
-			.css("height", window_h)
+		S("#image_background")
+			.set_width(window_w)
+			.set_height(window_h)
 			.click(hide_image)
 			.show();
 
@@ -40,24 +36,24 @@ function BlogEngine()
 			}
 
 			// Calculate a centred top-left destination for the window
-			var img_dest_t = window_t + window_h / 2 - img_dest_h / 2;
-			var img_dest_l = window_l + window_w / 2 - img_dest_w / 2;
+			var img_dest_t = window_h / 2 - img_dest_h / 2;
+			var img_dest_l = window_w / 2 - img_dest_w / 2;
 
 			// Place the image and show it
-			$("#image_display")
-				.css("top", img_dest_t)
-				.css("left", img_dest_l)
-				.css("width", img_dest_w)
-				.css("height", img_dest_h)
+			S("#image_display")
+				.set_top(img_dest_t)
+				.set_left(img_dest_l)
+				.set_width(img_dest_w)
+				.set_height(img_dest_h)
 				.click(hide_image)
 				.show();
 
 			// Place the border and show it
-			$("#image_foreground")
-				.css("top", img_dest_t - 5)
-				.css("left", img_dest_l - 5)
-				.css("width", img_dest_w + 10)
-				.css("height", img_dest_h + 10)
+			S("#image_foreground")
+				.set_top(img_dest_t - 5)
+				.set_left(img_dest_l - 5)
+				.set_width(img_dest_w + 10)
+				.set_height(img_dest_h + 10)
 				.click(hide_image)
 				.show();
 		}
@@ -66,9 +62,9 @@ function BlogEngine()
 	// Hide the image display elements
 	hide_image = function()
 	{
-		$("#image_background").hide();
-		$("#image_foreground").hide();
-		$("#image_display").hide();
+		S("#image_background").hide();
+		S("#image_foreground").hide();
+		S("#image_display").hide();
 	}
 
 	$(document).ready(function()

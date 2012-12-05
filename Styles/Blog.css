@@ -153,7 +153,7 @@ h1
 #image_background
 {
 	display:none;
-	position:absolute;
+	position:fixed;
 	background-color:#000;
 	opacity:0.5;
 	/*filter:alpha(opacity=0.5);*/
@@ -168,7 +168,7 @@ h1
 #image_foreground
 {
 	display:none;
-	position:absolute;
+	position:fixed;
 	background-color:#000;
 	top:0px;
 	left:0px;
@@ -181,7 +181,7 @@ h1
 #image_display
 {
 	display:none;
-	position:absolute;
+	position:fixed;
 	top:0px;
 	left:0px;
 	margin:0;

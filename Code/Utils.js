@@ -103,3 +103,62 @@ function bind()
 		return func.apply(scope, arg_array);
 	}
 }
+
+
+function Selector(name_or_node)
+{
+	this.Node = name_or_node;
+
+	if (typeof(name_or_node) == "string")
+	{
+		if (name_or_node[0] == "#")
+			this.Node = document.getElementById(name_or_node.substr(1));
+	}
+
+	this.show = function()
+	{
+		this.Node.style.display = "inline";
+		return this;
+	}
+
+	this.hide = function()
+	{
+		this.Node.style.display = "none";
+	}
+
+	this.set_left = function(left)
+	{
+		this.Node.style.left = left + "px";
+		return this;
+	}
+
+	this.set_top = function(top)
+	{
+		this.Node.style.top = top + "px";
+		return this;
+	}
+
+	this.set_width = function(width)
+	{
+		this.Node.style.width = width + "px";
+		return this;
+	}
+
+	this.set_height = function(height)
+	{
+		this.Node.style.height = height + "px";
+		return this;
+	}
+
+	this.click = function(fn)
+	{
+		this.Node.onclick = fn;
+		return this;
+	}
+}
+
+
+function S(name)
+{
+	return new Selector(name);
+}
