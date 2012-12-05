@@ -1,0 +1,112 @@
+<<Build System DIY>>
+
+UPDATE: The source code to PiB is {now available|PiB}.
+
+I've been setup in the new office now for a good 5 days and there have been bits of progress made here and there. Monday last week involved me building my new desk, cleaning out the office & working from my laptop, as my new computer hadn't arrived yet. It arrived later that night and I got everything setup on the tuesday - here's the space where magic will be happening... hopefully :)
+
+
+||{{http://farm6.static.flickr.com/5070/5876453449_c2772204b3_m.jpg|http://farm6.static.flickr.com/5070/5876453449_c2772204b3_b.jpg}}||
+
+
+Last week was pretty nerve-wracking. It started very slow: Will I enjoy what I'm doing? Can I work on my own for so long? Is the scope of the project within my grasp? Will the idea work? Is there a market for it? How many people are working on the same idea right now? Are there any out-of-the-blue financial disasters waiting to happen?
+
+My head was full of this kind of stuff and it kept me up for a couple of nights - not having a computer to work with added to the confusion. However, as the week progressed, my confidence started to build and on friday, I was working pretty quickly. I spent 2 years on Fable 3 as the engine lead and in that sort of role, you get maybe 2 hours of concentrated programming time before you have to put everything down and arbiter a debate, give some guidance, manage the schedules of others, or keep up to speed on communication between departments. It's hectic and can prevent you from coding for long periods of time. Not so any more! With nobody to disturb me, I'm quite tired by the time the day ends, having coded solid for many more hours.
+
+I've been looking into all kinds of different technology in the last week - I'll cover just one of them for now.
+
+==The Build Environment==
+
+The compiler I'm using is Visual C++ 2005 - I have every version up to 2010 but I've always preferred this above the rest, mainly for compiler performance. That may change later and in an upcoming blog post I might explain the other reasons I had for making this choice. Needless to say, I'll be writing fast and very small footprint C++ code.
+
+I need a code build system that can seamlessly handle multiple languages/platforms and tools and it needs to be dead simple. I can't afford to spend time worrying about whether it's working or not (hello, {/Gm|http://msdn.microsoft.com/en-us/library/kfz8ad09(v=vs.80).aspx}!) so it needs to be bullet-proof and very easy to configure/maintain. This rules Visual Studio out, despite it being the main build tool I've used on all projects for the last few years!
+
+My favourite tool of choice for this in the past has been {SCons|http://www.scons.org/}. It was used as the IDL compiler/builder and asset building system for Advent Shadow/Black&White at Full Fat and for the asset build system on Fable at Lionhead (until we wrote our own faster version of it in C#). I know it inside out but it constantly makes me despair - it's slow, complicated and I'm constantly fighting it trying to fit whatever build model I need to achieve into its crazy system (if you've fought with the {VariantDir|http://stackoverflow.com/questions/1074062/why-does-scons-variantdir-not-put-output-in-the-given-directory} issue, you'll know what I mean). Beyond that, if I was going to use SCons as a big project C++ builder across multiple platforms I'd want 100% control over all the command-lines, properties and platform project files - something SCons is not very good at (the .vcproj/.sln generators are quite poor).
+
+After some looking about for something simple, {fabricate.py|http://code.google.com/p/fabricate/} stood out with a very elegant implementation that unfortunately is only really "elegant" when it's run under Linux. It works by hooking the file system and implicitly figuring out what dependencies a build node has by recording any opened files. On Linux this is achieved using {strace|http://linux.die.net/man/1/strace} but there is no equivalent on Windows. The Windows implementation has to resort to using last file access times which performs poorly on large projects and has a few {unresolved issues|http://code.google.com/p/fabricate/issues/detail?id=14} still.
+
+One piece of software which might help here on Windows is {Detours|http://research.microsoft.com/en-us/projects/detours/}, which is yours for the princely sum of $9999.95 - or if you're willing to live with a license which makes the GPL look tame, you can have a free version.
+
+Alternatively there's {EasyHook|http://easyhook.codeplex.com/}. This is an awesome piece of software which I used to write the file system virtualisation for Fable 3's lighting distribution tool. With that knowledge in hand I was almost considering extending fabricate with EasyHook support for Windows. However, when you consider the amount of potential issues you'd need to solve on top of the basic implementation (including load/runtime DLLs, 32/64-bit application differences, child process launching), it starts to run away from you fast.
+
+There are many, many build systems out there but in the end I opted to build a very simple system myself and evolve it over time as my needs change.
+
+==PiB==
+
+So I headed straight for Python as it's one of my more productive languages. The system I set out to build initially took a day to write, followed by 2 days of making it robust and implementing features I didn't predict I needed.
+
+Assuming you already know how to write a system well enough, the graft required to take an existing system, modify it for your needs and maintain those modifications can be just as much as writing the system itself. Some systems resist modification with bad design that simply tries to assume as much as possible and do too much for you. If you're willing to pay for all the bugs you'll hit that an existing system has already solved and you can guarantee that you will be more productive as a result, do it.
+
+Am I more productive? By all accounts, yes! I've got a build system that for my needs seems good enough, allowing me to move on and concentrate on other things. I'd still be wrangling with SCons at this point and I'd probably be at the compromise stage where I'd cut off all development and move onto the next point (when you're paying your own wage, this can be quite sobering).
+
+So the features are:
+
+* Built in Python with very simple build logic - most of the code is Visual C++ tool-specific.
+* Arbitrary dependency graph building/evaluation, allowing any tool, language, platform, etc.
+* Lazy generation of .vcproj/.sln files.
+* Explicit and implicit dependencies - C++ header dependencies evaluated implicitly with /showIncludes cl.exe, making the build code much simpler and faster.
+* Build, rebuild, clean support.
+* Abstraction layer for most command-line options to cl.exe, link.exe and lib.exe.
+
+You stick your build scripts in a "pibfile", the simplest of which would look like:
+
+[code]
+def Build(env):
+
+	cpp = env.CPPFile("main.cpp")
+	exe = env.Link("Out.exe", cpp)
+
+	return [ exe ]
+[/code]
+
+It's not overly automated and doesn't try to do too much (e.g. SCons has a layer of complexity involved with being able to pass an object vs. a list of objects). All the guts are in the open for all to see and modify. I know this will change later but I'm not prepared to try predict how it will change at this point.
+
+==Problems with DIY==
+
+Of course, developing the system was not without its cost. There were some tricky problems I had to work around which I found out later that SCons had already solved.
+
+The first task was setting up the environment variables for a C++ compile under Visual C++ 2005. Locating the install directory was easy; it was just a case of calling the appropriate vcvars batch file to set up the environment and then calling whatever tool you needed. However, I wanted to do that only once at the beginning of the build, record the applied environment variables and record them for later application (instead of calling the batch file for each compile).
+
+There's no real way to do this in Python other than to run the batch file, call "cmd /c set" and parse the output from stdout. Getting this to run and parse in Python was easy with the subprocess module but calling Popen.poll would sometimes never return or return too early when the "set" command was involved. I eventually gave up and called Popen.wait, followed by Popen.communicate. This has to wait until the end and gives you the results in one go but it worked. And so I moved on.
+
+After running this from the IDE, however, it started hanging again. Process Explorer told me that while calling communicate was returning all text correctly, the python interpreter was in an infinite loop on exit because the Popen process hadn't closed itself. All attempts to kill/terminate it failed with "access denied".
+
+It gets worse...
+
+I thought that calling the built-in command "set" itself was the main issue and that getting at the environment by other means was fair game. So the process launch code was modified to do something like this:
+
+[code]
+with open("temp.bat", "w") as f:
+	print("call vcvars.bat", file=f)
+	print(sys.executable + " -c \"import os;print(os.environ)\"", file=f)
+[/code]
+
+Here it's recursively calling the Python interpreter with a string script to report the environment. This failed with the same problems, too! After more reading I was hearing mumblings of the subprocess module not being {thread-safe|http://bugs.python.org/issue1236} so I decided to see how SCons did it. And wouldn't you know, they came to a {similar conclusion themselves|http://scons.tigris.org/source/browse/scons/trunk/src/engine/SCons/Tool/MSCommon/common.py?revision=4958&view=markup}:
+
+[code]
+	# Use the .stdout and .stderr attributes directly because the
+	# .communicate() method uses the threading module on Windows
+	# and won't work under Pythons not built with threading.
+	stdout = popen.stdout.read()
+	stderr = popen.stderr.read()
+[/code]
+
+In short: subprocess is flaky by Python standards. Very flaky. I lost around 3 hours to this bug when the entire build system took me around 20 hours to create - that's a huge time sink. It would be interesting to replicate this in C++ to see if there are similar issues with "cmd /c set".
+
+==The future==
+
+I'll be releasing the source code to PiB in the next few days for others to browse and scrutinise - I just have to work out an appropriate license, first. Meanwhile, there are a few big todos I may address in the future:
+
+* What's the performance impact of pickling all the metadata? Lots of people mention that cPickle is an optimised C implementation which is better than the standard pickle module.
+* Instead of using input/output files, use abstracted nodes - I'm not sure how necessary this will be but I may need build steps that don't use the file system (something I recall SCons being bad at - but that's a very old experience).
+* Cache explicit dependencies and track the Windows USN Journal for absolute minimal file system interaction and very fast iterative building.
+* I need to write some functional tests for all this before I start modifying it some more!
+
+At the moment they're not important and we'll see how much "evolution" contributes to their need.
+
+==Final thoughts==
+
+So the last few days have been immensely productive and I'm pretty excited. I've been learning all kinds of new stuff and will get to work some more with Java and Javascript starting tomorrow. I've come up with a really good way of getting Reflection from C++ code that "might actually work" very elegantly but we'll see next week when I have the time allocated to write it all up.
+
+The most important outcome of all this is that PiB can be considered a "small victory" for me - a nice, self-contained project that has been completed in good time. If I can chunk up my work enough to get more small victories, there should be some good times ahead :)
+
+[disqus][/disqus]

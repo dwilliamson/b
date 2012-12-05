@@ -1,0 +1,9 @@
+<<Lightweight Javascript Blogging>>
+
+My blog has been a bit quiet for a while and I assure you that it will become apparent why within the week :) I'm hoping to also share a few words on what it feels like to be self-employed for a couple of months now.
+
+Anyway, on to some cute developments. The product I'm working on is web-based and the last time I used HTML, CSS, PHP and Javascript heavily was 2003. I wrote some crazy tools that could inspect our game asset database and allow content creators to visit a webpage and walk around our tree to inspect various stats: file size, poly count, mesh errors, whatever. Back then it was a nightmare to get anything non-trivial to function cross-browser.
+
+So in my spare time, I've created my own little blogging engine, which is what you're viewing this website through now :) It's entirely written in Javascript with some PHP server-side extensions for the stuff Javascript can't do (however, these are optional). The website is {here|TinyBlog}, so go check it out and let me know if it's any good!
+
+[disqus][/disqus]

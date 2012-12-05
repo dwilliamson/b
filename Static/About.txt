@@ -1,0 +1,11 @@
+<<About>>
+
+My name is Don Williamson and I'm a Brighton-based independent developer working on a concept which I'm hoping can be turned into a business. I've been a game developer for around 13 years, working in many programming roles on 14/15 or so published and un-published titles. Titles include Fable 2 & 3, Splinter Cell: Conviction, Advent Shadow, Black & White, Lucky Luke on the Daltons Trail, V-Rally, Flintstones, a couple of Army Men titles and an unanounced comic license with EA that went nowhere!
+
+I'm going to try and keep this blog updated with what I'm currently doing and how the concept/business is progressing. My goal is to have a 6 month concept prototype ready, with a reveal coming a year from now (hit the market running as early as possible!).
+
+I'll probably make some technical posts here and there and also plan to open-source some of the stuff I'm working on - but only if I can do so without affecting my own schedule. This is my personal blog and will not represent any company that I end up forming.
+
+==Curriculum Vitae==
+
+This was last updated around May of 2012 and is hosted on Google Docs. The direct link is {here|https://docs.google.com/open?id=0B40cW60MKWeDZ0gzTGNNYmduME0}.

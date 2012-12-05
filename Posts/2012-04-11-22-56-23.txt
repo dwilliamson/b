@@ -1,0 +1,25 @@
+<<Risk, Prototypes and Planetary Bodies>>
+
+Last month quietly welcomed the completion of my game/platform prototype: 8 months in the making! I'm only a few months away from an announcement for what I'm working on but it's worth taking a step back and looking at that figure for a minute.
+
+It's taken me 8 months to build... a "prototype."
+
+This is quite obviously not your standard prototype, but a complete implementation of the backbone of the game, demonstrating that it's technically feasible, achievable with my limited resources and fun to play. I've had some interesting reactions to this:
+
+* I'm still not ready to show it to people close to me, although I'm more comfortable talking about what it is. While the concept works, developing it has given me a few ideas that I want to adjust/add first.
+* I took 2 weeks out to throw away all my heightfield rendering and collision code to make a hugely sweeping change: the world is now a spherical planet with deep caves, overhangs and some incredibly interesting world generation functions. While the impact of change will still be felt 2 months from now (the physics is tricky, populating it is tricky), the result is beautiful. Oh, it's also deformable, as in: you can blow huge chunks out of the planet, if you like! Whether this will make it into the game design is yet to be seen, but it was trivial to add once I had the basics.
+* I've become a lot more confident in my own ability to ship a beta without bringing anybody else onboard. This sounds pretty crazy and I would rather have an art director help me out, but finding somebody in a similar situation to my own is tough.
+* The schedule is extended and I'm considering spending more of my money on making the game. However, the realisation that I need to get something out there this year still remains. If anything, the realisation is heightened.
+* I have no real attachment to my distribution platform of choice (Web-based, native C++ gameplay and Javascript client). I will literally use anything as long as it doesn't get in my way.
+
+I think what I'll do is some kind of slow reveal of what the project is. I have a complete visual history of the development of the game and I reckon slowly showing the screenshots would be fun.
+
+== A bit of fun ==
+
+Last thursday night I decided to hang around at work and implement a live editing environment for Notch's DCPU-16 program, for Mojang's game {0x10c|http://0x10c.com/doc/dcpu-16.txt}. I stayed until about 6am the next day - something I haven't done in years (I used to work 36 hour stretches in 120 hour weeks back when I was a bit greener). The result is {here|http://t.co/2MvNTRvi}.
+
+This was immensely fun to work on - I've made a few fixes but not really worked on it too much. However, the temptation is there to make it a much nicer environment to work in. The internets seem to have {reacted|https://github.com/blog/1098-take-over-the-galaxy-with-github} {positively|https://twitter.com/#!/C418/status/190010024330936320} to it and it's been pretty amazing to see how people have used it.
+
+Part of me believes I should be working like that for my own game, but the experienced guy inside me realises I'd burn out in a few weeks. I'm in this for the long haul :)
+
+[disqus][/disqus]

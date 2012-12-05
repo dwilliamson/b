@@ -1,0 +1,33 @@
+<<The life of a self-employed>>
+
+So I'm at the 3 month mark of being self-employed and everything is going good. It's about time I broke the trend of technical posts and covered some real life news.
+
+As far as project progress is concerned, I'm not where I expected I'd be after 3 months. I'm taking a technology route that's quite unusual in order to make my product as accessible as possible, which means there's not much prior art I can easily root out. There have been a few dead-ends along the way, although there have been at least as many successes I didn't predict when I first started.
+
+The fact that I'm behind schedule has been worrying me. When you work for a larger company there are certain stresses related to feeling powerless when decisions are taken away from you, especially when you have a certain amount of emotional investment in the work you do. Working for yourself you have the freedom to do what you want, bounded by the more pressing requirement of releasing something. It feels amazing and therapeutic but there are times when it can be just as stressful.
+
+I've been constantly thinking about what I would do if everything didn't work and it saps quite a bit of energy. Should I move sideways into VFX? Should I move overseas again where the industry is more stable? Should I take my newfound experience and move away from console games? These questions and more would sometimes keep me up into the early hours of the morning.
+
+I've come to realise it's completely the wrong mindset, however - I need to trust my own ability to think of a solution if that time ever comes. That single realisation has made me feel a whole lot better about things.
+
+The feeling you get when suddenly a regular wage isn't coming into your account after years of steady jobs is sobering. I was expecting this as I left my job 10 years ago for 3 months to further my abilities on what meagre savings I had. But that doesn't stop the shock and it really works to sharpen your money skills.
+
+My personal spending took a while to calm down. It's still not where I want it to be but we are making more changes to help that:
+
+* I've cancelled my phone insurance and gone for a much cheaper {online solution|http://www.protectyourbubble.com/}.
+* I tried to buy myself out of my HTC phone contract with my previous insurance but they had a clause whereby they took ownership of the phone and number. Given the phone is pretty good, I'll save more money staying until the end of the contract, selling the phone and getting a cheaper model.
+* Going out for meals in the evening is something we used to do often but that's been cut back quite a bit.
+* I'm going to the supermarket once a week and buying stuff to make lunch with instead of walking around town and buying everything pre-made.
+* The office I'm in is too expensive. It's really nice but simply overkill. I need some smaller desk space in an open-plan office with other people and I have some good candidates that will save me a lot of money.
+* Visiting my family has become less regular. I live about 150 miles away from them and the cost of a train fare is something I have to seriously consider before going.
+* All my old gadgets and clothes that are still worth some good money, I've been ebaying (I haven't used my Macbook Air in 2 years!).
+
+And so much more...
+
+This is really changing my outlook on life and giving me some good skills which I lost a long time ago. However the one thing I could never have predicted is that all of a sudden I want to buy a house! We live in a great house in Brighton but the majority of what I'm paying myself is going directly to our landlord and that really winds me up.
+
+I never used to care - I always loved being able to move quickly between cities/countries; a luxury when you're getting a regular income. So I'm going to sink some money into a deposit and we should hopefully have our own house by the new year! This decision has similarly relieved me of an awful lot of anxiety.
+
+And finally the project itself: I'm kicking out code like there's no tomorrow. I'm obviously not as fast as I was 10 years ago (and I need routine rest, food and exercise) but I'd like to think I'm many times more efficient. I'm writing the code I've been trying to convince other people to pay me to write for years and I'm loving every bit of it. Hopefully it will pay off!
+
+[disqus][/disqus]

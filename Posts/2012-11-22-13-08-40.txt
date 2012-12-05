@@ -1,0 +1,66 @@
+<<Star: Native Browser Games & Tools with clReflect>>
+
+A long time passed between development of the previous screenshots and the ones I'll show here; I think it was about a month or so. A quick summary of the additions would be:
+
+* The game is now hosted in a browser.
+* Added a very simple HTML/Javascript user interface that communicates with the game.
+* Added some character locomotion and vehicle physics.
+* Defined what a world, scene and clip were, and started work on recording.
+
+This is a shot of being "On Set" in the game:
+
+||{{http://farm9.staticflickr.com/8490/8208806614_3bf71f8d4b_z.jpg|url:http://www.flickr.com/photos/donw/8208806614}}||
+
+It took a while to get to this point and there are multiple builds of the game that represent the version I use for development and the version that I want to ship to players.
+
+== clReflect as a Platform ==
+
+The core problem that required solving was seamless communication between native C++ and Javascript - {clReflect|https://bitbucket.org/dwilliamson/clreflect} provides a means of safely hiding and abstracting that transport layer. It also allows the transport layer to be very minimal and not interfere with development. Currently, this is a Java Applet, using JNI to load the native code. 
+
+The development stack I ended up with looks like this:
+
+||{{Images/StarStackDevelopment.gif|Images/StarStackDevelopment.gif}}||
+
+The browser is the client and the game is the server. clReflect transparently serialises data types, events and function calls to and from a JSON string buffer, which in turn gets sent over the network. This is a format that is native to Javascript and trivial to encode and decode in the browser. The final D3D frame buffer is resolved to a shared memory buffer, instead of interfering with network traffic. This introduces some latency to the game.
+
+The Server and Applet are separated because the Java JNI is still quite an horrendous platform to develop for (I experimented with it first over 10 years ago and it's still just as bad). It's tough to debug native code that crashes and the means of defining interfaces is tedious and error-prone.
+
+The JNI and Host DLLs are separated because I wanted to runtime reload any DLL changes while the applet is still running. I tried for a very long time to get Java to reload its native DLLs in a session but it's fraught with horror stories. The simplest of solutions was also the cleanest: just stick it in another DLL and your JNI interaction is limited a single 100 line C++ file!
+
+Messages flow directly between the server and the browser and the final image is displayed through the Java canvas. This is completely browser independent (currently runs in Chrome, Firefox & IE); I discussed some of the details in an {earlier post|2012-03-08-13-00-00}.
+
+The shipping stack will look like:
+
+||{{Images/StarStackShipping.gif|Images/StarStackShipping.gif}}||
+
+Network I/O is gone and everything is hosted in the JNI DLL. This cuts out a number of security holes for the user and replaces the TCP/IP connection with a simple in-memory ring buffer replacement.
+
+It's worth mentioning that the {Bitbucket repository for clReflect|https://bitbucket.org/dwilliamson/clreflect} contains most of the code you need to get up and running with a system like this. I may open-source the remainder at a later date.
+
+== Java as a Platform ==
+
+Ultimately, I'm not in any way invested in Java as the final platform. The way everything is set up, I can even support multiple hosting platforms. My ideal inbetween layer would be {Empscripten|https://github.com/kripken/emscripten/wiki} (or something similar) but the performance is not there yet and I am doing so many crazy things that are a long way from being supported (I might do some contributing next year).
+
+The other possibility is Google's {Native Client|https://developers.google.com/native-client/}. This has the added bonus of sandbox-style security and multiple OS support. When I started this project, NaCl was in its infancy but I can see myself supporting it in the future. The important point is that I haven't been bottle-necked by any limitations in its maturing feature set. The limitation to Chrome and Google Store are somewhat irksome, though.
+
+Origin are really missing a trick. While they're not as directly tied to the browser as something like NaCl, they have the potential to become as much of an app platform as something like that. Either way, I will ship on the Java platform and look to support other platforms in the future.
+
+== The Game ==
+
+In the build above, you can drag and drop any item into the world and take control of it. Obviously, everything is just built up with simple primitives but it was a fun start to the game. The hit testing is done by rendering everything into the frame buffer with their object IDs and reading back the data under the mouse. This is the way it should really be done in all editors, unless you have some real-time feedback you need to optimise - more on that in a future post.
+
+Vehicle physics uses raycast suspension - a tricky balancing act under Bullet's old-style implicit euler integrator. It took a while getting the numbers right while trying to keep the time step as large as possible. The character locomotion was FPS based, using a sphere driven by physics forces to move yourself around. You could drop as many cameras and items into the world at that point and run around controlling them.
+
+I also added some fogging to give distance cues and hide the heightfield boundary - landscape streaming/generation was not a challenge required for the prototype. This was nothing special, just a per-pixel exponential fall-off to the sky colour.
+
+Any new game updates are automatically updated and all my data is JSON-serialised with clReflect. While this means it's naturally versionable, I know that I will have some tricky scenarios to solve with auto-updating on client machines at a later date.
+
+Finally, I roughed out the "Editing Room" tab for bringing all your clips together into a movie:
+
+||{{http://farm9.staticflickr.com/8341/8207716695_8b00338f9a_z.jpg|url:http://www.flickr.com/photos/donw/8207716695/}}||
+
+None of that was functional, but the ability to quickly mock-up the user interface in HTML/Javascript was really nice. The game window is just a translated version of the On Set window.
+
+Now we're getting somewhere! :)
+
+[disqus][/disqus]

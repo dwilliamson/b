@@ -1,0 +1,25 @@
+[lit]
+<div style="position:relative; top:-28px">
+<a href="rss.php"><img src="Images/rss_32.png" style="width:20px"></a>
+<a href="http://twitter.com/#!/Donzanoid" target="_blank"><img src="Images/twitter_32.png" style="width:20px"></a>
+<a href="http://donw.org/+" target="_blank"><img src="Images/google_plus_32.png" style="width:20px"></a>
+<a href="https://bitbucket.org/dwilliamson" target="_blank"><img src="Images/bitbucketicon.ico" style="width:20px"></a>
+<a href="https://github.com/dwilliamson" target="_blank"><img src="Images/githubicon.ico" style="width:20px"></a>
+<a href="http://uk.linkedin.com/pub/don-williamson/1/791/412" target="_blank"><img src="Images/linkedin.png" style="width:20px"></a>
+<a href="http://www.facebook.com/d.d.williamson" target="_blank"><img src="Images/facebook_32.png" style="width:20px"></a>
+<a href="http://soundcloud.com/d-d-williamson" target="_blank"><img src="Images/orange_transparent_48.png" style="width:20px"></a>
+</div><div style="font-size:8pt; line-height:1.3em;">[/lit]**BitBucket**
+{clReflect|https://bitbucket.org/dwilliamson/clreflect} - C++ Reflection using Clang
+{SHRotation|https://bitbucket.org/dwilliamson/shrotation} - Spherical Harmonic rotation
+{Tahiti|https://bitbucket.org/dwilliamson/tahiti-game-language} - Game programming language
+{PiB|https://bitbucket.org/dwilliamson/pib} - Python-based build system
+{Reflectabit|https://bitbucket.org/dwilliamson/reflectabit} - C++ Reflection using templates
+{Rfl|https://bitbucket.org/dwilliamson/rfl} - C++ Reflection using PDB files
+{Tiny Blog|https://bitbucket.org/dwilliamson/tiny-blog} - Client-side Javascript blog engine
+{AssemblerVM|https://bitbucket.org/dwilliamson/assemblervm} - Assembler & Virtual Machine
+
+[lit] [/lit]**Github**
+{dcpu16.js|https://github.com/dwilliamson/dcpu16.js} - DCPU-16 Assembler & Emulator
+{DCPU-16|https://github.com/dwilliamson/dwilliamson.github.com} - DCPU-16 browser live-edit
+
+[lit]</div>[/lit]

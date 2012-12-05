@@ -1,0 +1,132 @@
+<<Smoother Assert Response with Visual Studio>>
+
+
+In my never-ending crusade to make my programming life as easy as possible, reducing click counts and milliseconds between iteration, I came up with a quick hack to my setup that speeds up my assert response. But what does that mean, exactly?
+
+Let's say you have an assert function that uses the --[lit]__debugbreak()[/lit]-- macro (documented {here|http://msdn.microsoft.com/en-us/library/f408b4et.aspx}):
+
+[code]
+void Assert(bool expression)
+{
+	if (expression == false)
+	{
+		MessageBoxA(0, "<<expression goes here>>", "ASSERT Failed", MB_OK);
+		__debugbreak();
+	}
+}
+[/code]
+
+Obviously, the first dialogue it pops up is for your specific assert [1]:
+
+||{{Images/AssertTriggered.gif|Images/AssertTriggered.gif}}||
+
+On a new development machine in Windows 7, the first dialogue box you get is this one [2]:
+
+||{{Images/CheckingForSolution.gif|Images/CheckingForSolution.gif}}||
+
+This can take a long time before it finally figures out there's nothing it can do about your own program and then pops up this one [3]:
+
+||{{Images/GameStoppedWorking.gif|Images/GameStoppedWorking.gif}}||
+
+You hit --Debug the program-- and the next popup you get is this one [4]:
+
+||{{Images/JITDebug.gif|Images/JITDebug.gif}}||
+
+Annoyingly, this window isn't brought to the top so you have to locate its flashing icon in the task bar and switch to it (or ALT-TAB). After selecting the existing Visual Studio instance and pressing --Yes--, the debugger attaches to your program, jumps to the line where you have the problem and pops up its final dialogue [5]:
+
+||{{Images/BreakpointTriggered.gif|Images/BreakpointTriggered.gif}}||
+
+Again, the Visual Studio window isn't brought to the top so you have to manually switch before you can hit --Break--.
+
+It's exhausting. To make it worse, switching to some of the windows doesn't automatically switch keyboard focus, either. You can do two things immediately: The first is to remove your custom assert dialogue and the second is to type "Choose how to report problems" in the start menu and make sure "Never check for solutions (not recommended)". This will remove the first two popups, still leaving you with the long trail of dialogue clicks and switches before you figure out what's just happened. Annoyingly, you've just removed the assert dialogue box so you won't know what they problem is until you click through the mess.
+
+After searching for a while I couldn't find anything that would disable those dialogue boxes so I figured I'd have a go at putting the app in a situation where they wouldn't have to show up.
+
+
+== Solving the simple case ==
+
+If you run with the debugger attached from the outset, this entire process is skipped. All you get is dialogues [1] and [5] popping up. You can detect this specific scenario using {IsDebuggerPresent|http://msdn.microsoft.com/en-us/library/windows/desktop/ms680345(v=vs.85).aspx} and suppress the dialogue box in that case:
+
+[code]
+void Assert(bool expression)
+{
+	if (expression == false)
+	{
+		if (!IsDebuggerPresent())
+			MessageBoxA(0, "<<expression goes here>>", "ASSERT Failed", MB_OK);
+		__debugbreak();
+	}
+}
+[/code]
+
+Instantly, Visual Studio becomes the app with primary focus and only brings up dialogue [5]. Given that I can't find any means of disabling [5], this is the ideal solution. Visual Studio also has keyboard focus so you just press ENTER and continue into your source code.
+
+
+== Forcing Visual Studio to attach before breaking ==
+
+In a {previous post|2012-02-07-11-37-23}, I covered how you can remotely request that Visual Studio attaches to a running program. The steps required were:
+
+* Write a Visual Studio macro that attaches to the program (source is in the previous post).
+* Write a vbscript or executable that uses Visual Studio's COM Automation Model to execute that macro.
+
+I've upgraded to Visual Studio 2010 since then and took the opportunity to rewrite the C++ program that executes the macro. As far as I can recall, I couldn't actually get it to work with 2010 so I had to write it in C# instead. That actually turned out to be a huge benefit because the program simplified to:
+
+[code]
+using EnvDTE;
+
+namespace AttachDebugger
+{
+	class Program
+	{
+		static void Main(string[] args)
+		{
+			DTE dte = (DTE)System.Runtime.InteropServices.Marshal.GetActiveObject("VisualStudio.DTE.10.0");
+			dte.ExecuteCommand("Macros.StarVSMacros.Debug.AttachToGame");
+		}
+	}
+}
+[/code]
+
+This required the single .NET reference --EnvDTE-- to build successfully.
+
+Assuming use of the --RunProcess-- function from the initial post, the assert function can then become:
+
+[code]
+void Assert(bool expression)
+{
+	if (expression == false)
+	{
+		if (IsDebuggerPresent())
+		{
+			__debugbreak();
+		}
+		else
+		{
+			// Popup your assert info - you may want an extra check here to disable
+			// it on programmer machines.
+			MessageBoxA(0, "<<expression goes here>>", "ASSERT Failed", MB_OK);
+
+			// Try and launch the executable that gets Visual Studio to attach the debugger
+			if (RunProcess("AttachDebugger.exe"))
+			{
+				// Wait around for it to complete - make sure you have a time-out here
+				while (!IsDebuggerPresent())
+					Sleep(1);
+			}
+
+			// This is a completely arbitrary wait period. If __debugbreak is called before
+			// the attach macro gets a chance to finish, Visual Studio goes into an infinite
+			// loop that requires you to kill devenv.exe and attachdebugger.exe.
+			// This isn't ideal, you may want to introduce a more explicit sync, but this works
+			// well enough for me on my own project.
+			Sleep(100);
+
+			__debugbreak();
+		}
+	}
+}
+[/code]
+
+This works really well. With my implementation, I always display the assert dialogue when the debugger isn't attached. I instantly get dialogues [1] and [5] with full window/keyboard focus switches.
+
+[disqus][/disqus]

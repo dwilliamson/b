@@ -1,0 +1,37 @@
+<<PiB - A simple Python Build System>>
+
+PiB originated out my desire for a very simple, easy to understand code build system that I could naturally evolve over time as my needs for it changed. I discussed some of the reasons behind that in a {blog post|2011-06-28-17-04-00} that also covered some of the drawbacks in taking such an approach.
+
+It can be downloaded or browsed at its {Bitbucket|https://bitbucket.org/dwilliamson/pib} repository and is released under the {MIT License|http://en.wikipedia.org/wiki/MIT_License}.
+
+Currently it will only compile Visual C++ 2005 files and will build executables, DLLs and libraries. Support for more languages and platforms will be coming soon.
+
+Use is quite simple. Create a "pibfile" wherever you want to compile code and add some Python code to build the dependency graph or generate .vcproj/.sln files. A simple example would be:
+
+[code]
+cpp = env.CPPFile("main.cpp")
+exe = env.Link("Out.exe", [ cpp ])
+env.Build(exe)
+[/code]
+
+The source code comes with a more elaborate example of its explicit and implicit dependency handling for C++ files. Generating project/solution files is an optional step you can add and it's already more powerful than the generators built into {SCons|http://www.scons.org/}:
+
+[code]
+VCGenerateProjectFile(env, "Project", [ "main.cpp" ], exe)
+VCGenerateSolutionFile(env, "Solution", [ "Project" ])
+[/code]
+
+The project and solutions will only get generated if their inputs change.
+
+Current features include:
+
+* Built in Python with very simple build logic - most of the code is Visual C++ tool-specific.
+* Arbitrary dependency graph building/evaluation, allowing any tool, language, platform, etc.
+* Lazy generation of .vcproj/.sln files.
+* Explicit and implicit dependencies - C++ header dependencies evaluated implicitly with /showIncludes cl.exe, making the build code much simpler and faster.
+* Build, rebuild, clean support.
+* Abstraction layer for most command-line options to cl.exe, link.exe and lib.exe.
+
+More will be added as the product I work on needs them.
+
+[disqus][/disqus]

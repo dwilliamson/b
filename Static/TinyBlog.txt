@@ -1,0 +1,152 @@
+<<Tiny Blog for Javascript>>
+
+This is a small blog engine written entirely in Javascript for those who want full control of their website, with the following features:
+
+	* No server-side code is executed, improving security for the blog host.
+	* All HTML markup is generated client-side, decreasing required bandwidth and speeding up access to the site.
+	* Posts and static pages are stored as flat files, with no database requirements.
+	* Contains a simple wiki formatting engine.
+	* Contains a simple syntax highlighting engine for C++.
+	* You include the code necessary to populate and format your site; you don't have to get up to speed with a theme API.
+	* Allows you to programatically generate pages (e.g. a post archive page).
+
+I wrote this for my webpage at {donw.org|http://donw.org} to relearn as much Javascript/HTML/CSS as I could (last time I used it was way back in 2003 for some internal game asset tools - times have changed!). As such, I won't be extending the software much, if at all.
+
+The blog engine is really designed for those who know CSS and HTML pretty well, as the lack of a theme API means you have to design and control most of the layout yourself. Hopefully this will serve as an educational tool, if nothing else!
+
+==Installation==
+
+The latest Tiny Blog can be downloaded here {https://bitbucket.org/dwilliamson/tiny-blog|https://bitbucket.org/dwilliamson/tiny-blog}, weighing in at around 10kb. Copy all files to the folder you want your blog to be on the website.
+
+You will need to include the following style sheets in your header:
+
+[code]
+Styles/Blog.css
+Styles/Main.css
+[/code]
+
+--Blog.css-- contains all the styles the blog engine itself uses, while --Main.css-- is an example of storing style sheets for your own site.
+
+In the body of your HTML, include the following Javascript files:
+
+[code]
+[lit]http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js[/lit]
+Code/Utils.js
+Code/Parser.js
+Code/ParserState_Wiki.js
+Code/ParserState_Code.js
+Code/BlogEngine.js
+[/code]
+
+Note that the code uses {jQuery|http://jquery.com/}, downloading the file from off-site to reduce bandwidth on your own site. You will now need to invoke the blog engine using Javascript.
+
+As this is an entirely client-side blog engine there is no way to enumerate any of the blog posts or static pages that are stored on the server. Because of this, you will need to specify the complete list of files up-front, if you don't want to use the PHP:
+
+[code]
+var blog_posts = [ "Posts/2011-06-06-20-20-57.txt", "Static/About.txt", "Static/TinyBlog.txt" ];
+[/code]
+
+If you can use PHP and wish to do so, you can use some included PHP utils to generate that list for you:
+
+[code]
+<?php
+	require("Code/Utils.php");
+	GenerateBlogPostArray("blog_posts");
+?>
+[/code]
+
+Finally, you create the blog engine and add any parsed posts to named div tags:
+
+[code]
+var blog_engine = new BlogEngine();
+blog_engine.DisplayPosts("#content", blog_posts, get_url_parameters());
+[/code]
+
+--#content-- specifies the name of the div tag you want the blog posts to end up in, using jQuery's selector syntax.
+
+==Adding posts and static pages==
+
+Posts and static pages are simply text files located in the --Posts-- and --Static-- directories. Whenever you add a new post, its filename must spell out the date and time that post was created, in the format:
+
+[code]
+YYYY-MM-DD-HH-MM-SS (example, "2011-08-12-11-32-00.txt")
+[/code]
+
+Static pages can have any filename they want.
+
+==Wiki formatting==
+
+This will allow you to format your posts or static pages using convenient shorthand that is vaguely modelled existing wiki syntax models. The parser itself can exist in varying states, the default of which is the Wiki state. Switching state is achieved by entering and exiting tags enclosed with square brackets. Available tags are:
+
+* **code** : Used for syntax highlighting of code. Quite basic but produces results that are easy to read. Only C/C++ supported.
+* **lit** : No parsing rules are applied and the text you write gets emitted verbatim. This allows you to embed HTML or cancel syntax highlighting choices.
+
+When you're in the Wiki state, there are many formatting options available to you:
+
+This is how you **bold text** : [lit]**Bold**[/lit]
+This is how you --italicise text--: [lit]--Italics--[/lit]
+This is how you __underline text__: [lit]__Underline__[/lit]
+You can **--__mix them all__--***: [lit]**--__mix__--**[/lit]
+
+==Smallest header== [lit]==Smallest header==[/lit]
+===Bigger header=== [lit]===Bigger header===[/lit]
+====Even bigger header==== [lit]====Even bigger header====[/lit]
+=====Biggest header===== [lit]=====Biggest header=====[/lit]
+
+||You can center text: [lit]||center text||[/lit] ||
+
+This is a {link to another page|http://donw.org} : [lit]{descriptive text|http://donw.org}[/lit]
+This is a link to a {local static page|About} : [lit]{descriptive text|About}[/lit]
+This is a link to a {local blog post|2011-06-06-20-20-57} : [lit]{descriptive text|2011-06-06-20-20-57}[/lit]
+
+* This is a table
+* with multiple
+* entries that are
+* bullet-pointed.
+
+[code]
+* This is a table
+* with multiple
+* entries that are
+* bullet-pointed.
+[/code]
+
+This is an image link using a thumbnail that displays the full image with the built-in image viewer:
+
+{{http://farm3.static.flickr.com/2206/2059955009_58ff0c4032_t.jpg|http://farm3.static.flickr.com/2206/2059955009_58ff0c4032_m.jpg}}
+
+[lit]{{http://host/thumbnail.jpg|http://host/fullsize.jpg}}[/lit]
+
+This is an image that links to a specific page, instead of popping up the viewer:
+
+{{http://farm3.static.flickr.com/2019/2060736398_35ba3829a2_m.jpg|url:http://donw.org}}
+
+[lit]{{http://host/image.jpg|url:http://donw.org}}[/lit]
+
+==Generating pages==
+
+Some pages can't be constructed by hand. A good example of this is the blog archive page over on the right - this needs to be generated based on the list of posts made so far.
+
+When you present the list of posts to the blog engine, if anything in that list is not a string it will assume it's a --Parser-- object and attempt to parse it. You can create a parser object quite simply:
+
+[code]
+	var parser = new Parser("<<Title>>\nSome text!", null, "");
+[/code]
+
+An example of such a generator exists in --Code/Utils.js--, a function called --build_archive_page--. Give the list of blog posts, this will generate what you see on the right under **Archives**.
+
+==RSS feed generation==
+
+The final piece of the puzzle is RSS feed generation. This is another piece of software that needs to be done on the server and as such, you can choose not to have a feed. If you want one, the file --rss.php-- will generate a feed based on the contents of the --Posts/rss.txt-- file. An example of its contents is:
+
+[code]
+2011-06-06-20-20-57|First Post!
+[/code]
+
+For each post, you will need the date as specified in the filename and the title of that post. I chose to implement it this way to keep the amount of code executed on the server to a minimum. Whether this matters or not, I don't know! However, it's very easy for this to become out-of-sync so I may revisit this solution at a later date.
+
+==Feedback==
+
+If you find this useful and have made some modifications of your own, please let me know! It's probably best to contact me via my Twitter account.
+
+[disqus][/disqus]

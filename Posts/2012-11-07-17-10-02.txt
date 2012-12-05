@@ -1,0 +1,51 @@
+<<Announcing Project: Star>>
+
+It's about time I started talking about my new game. I want to keep things very low-key for the moment so I'll limit activity to this blog until I have more to show. Over the coming months, starting with the first screenshot I took of the game a year ago, I'll slowly add more information about the project with some increasingly delicious accompanying screenshots.
+
+=== Overview ===
+
+The core principle is to democratise the art of story telling through movie making. The end goal being to give creative users like you or I the ability to make Pixar-style movies, without expensive tools or arduous creative process.
+
+I hope to allow people to achieve this using the everyday mechanics that we are used to in video games. To that effect, multiple people will be able to collaborate on various parts of a movie in several distinct steps:
+
+== Explore ==
+
+You are placed on a procedurally generated planet the size of our own Earth and tasked with finding good locations at various times of day to film. You can walk around the surface, swim in the oceans or explore caves underground. If you want to look further afield you can drop a car, plane or any other vehicle into the world and explore to your heart's content. Not satisfied being bound to the planet? Not a problem! Get in any space vehicle and you can travel above the atmosphere to host your own space opera.
+
+== Create ==
+
+Once you have found your various sets you can extend them further by digging into and sculpting the terrain around them. It's all smooth-voxel based so you can create whatever structures you can imagine with different types of brush; from simple bricks to smoothly modifying air brushes. The same techniques can be used to create your own custom props, vehicles and characters that can be shared with your friends - kind of like sculpting clay in a game, but a lot simpler :)
+
+== Film ==
+
+To plot the path of a car in a chase scene there's no need to deal with complicated 3D curve or animation tools; just drop a car into the world and get your actor to drive it using typical game controls. Hit record and play out your scene. Once you've filmed your scene, you can add more actors, vehicles, props, cameras, or whatever else you need and when you hit record, the actions of prior actors will be played out as you act. You can go back and change performances on an individual basis. Think the actor animations aren't good enough? Make some better ones by hooking up your Kinect and acting out live, in-game!
+
+== Edit ==
+
+After you've filmed a few scenes, pull them into the edit room where you can drag everything onto a timeline and stitch them together to make your movie. Add post-processing effects (black & white with film grain?), text overlays, extra sound-effects, cross fades or whatever else you need to tell your story. If something isn't quite right with a scene (camera angle not good enough?), switch right back to it and adjust whatever isn't right without affecting other performances.
+
+== Share ==
+
+The final result is a recorded movie with all the rendering bells & whistles dialed up to high, shareable on sites such as Youtube or Vimeo.
+
+=== The Beginning ===
+
+One year ago, the plan for the game was to make movies on an island, as one of my inspirations for the game is the fabled Stunt Island from Disney. Of course, as I'm self-employed and really want to push myself, this was shelved in favour of an entire planet (sheesh, I really don't like to make my life easy).
+
+So once I had some very simple base libraries I needed a means to render an island. This called for a very basic heightfield renderer and a good old plasma generator to randomise the heights:
+
+||{{http://farm9.staticflickr.com/8202/8163775012_3ee904474e.jpg|url:http://www.flickr.com/photos/donw/8163775012/in/photostream}}||
+
+I suppose what's interesting about this little window is that it's just a dummy application that does nothing but send/receive network messages, sending input to the main game executable when it receives it and displaying images whenever the game sends them over. The eventual goal was to host the game in a browser, using all the standard HTML5 tools to build the user interface.
+
+== Where next? ==
+
+This is where it all kicks off. I'm nervous as hell typing this up. I've been tight-lipped about this project for a year now and it's really starting to wear me down. I didn't want to share for many reasons, including: fear of the idea being "stolen" ({No One Cares About Your Cool Game Idea|http://www.flarkminator.com/2011/01/09/no-one-cares-about-your-cool-game-idea/}), a complete inability to describe what I had in my head to people, fear of people thinking the idea was complete nonsense and a lack of concrete direction: the first 6 months were crazy-disorganised experimentation and discovery.
+
+There are so many routes I can take this project, I sometimes get overwhelmed thinking about it. Just the thought of having multiple people coming into your own world and acting out a scene in a movie makes me giddy with excitement. The possible render modifications and platform modding tools I can expose to make each movie as unique as possible is crazy. The ability for people with different skills to contribute to whatever part of a movie they can, create a library of props for specific movie types (a Western?), make different characters or just film small movies on their own buzzes the imagination.
+
+I now know exactly where I want to go with this and it's my hope that writing some open, honest posts about the development of the game will help combat a few of the irrational fears I have.
+
+Coincidentally, today also marks 2 years to the day that I moved my life from Guildford to Hove to live with my beautiful girlfriend. I've only just found this out now - pretty awesome :)
+
+[disqus][/disqus]

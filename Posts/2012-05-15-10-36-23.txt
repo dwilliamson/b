@@ -1,0 +1,249 @@
+<<An Implementation of _CIpow>>
+
+The game I'm working on is playable in a browser and written in C++. There are no installation steps: you just head to the webpage, it syncs the latest version and you play. To achieve this I had to build my own C/C++ CRT implementation, not relying on the countless versions shipped by Microsoft in DLL or LIB form that may or may not be on the host machine. Given that I want an entire version to be downloaded within a few seconds, I've also invested a bit of effort in making the game code as compact as possible. At 80k lines of code, my total download currently hovers around 200k - which is nice.
+
+The {pow|http://msdn.microsoft.com/en-us/library/dt5dakze.aspx} function is one of a few standard C runtime functions that the Visual C++ Compiler {treats differently to others|http://msdn.microsoft.com/en-us/library/tzkfha43.aspx}. Without specific optimisations enabled, the standard function will be called. However, in release builds, it's likely to invoke {_CIpow|http://msdn.microsoft.com/en-us/library/ff770583.aspx}, allowing it to push arguments directly onto the FPU stack with its own custom calling convention.
+
+For fast code, this and many others require implementation if you are writing your own CRT. Anybody who writes 4k/64k demos should be familiar with this practice. The declaration of _CIpow is:
+
+[code]
+extern "C" __declspec(naked) void _CIpow()
+{
+	// double r = pow(double x, double y)
+	// st0 = y, st1 = x
+	// result left in st0
+}
+[/code]
+
+This function has to be naked as the calling convention is custom with no exposed compiler support; all parameters are managed on the FPU stack. This means that you're playing with fire if you attempt to store local variables or call other functions that handle the implementation for you. Of course, you could take the inputs, construct your own stack frame and call out to an implementation function with inline assembly but that just seems like one big waste of time.
+
+I decided to write an implementation of _CIpow that takes account of:
+
+* Early outs for exponents of one or zero, or a base of zero with positive exponent.
+* Result of 0^0 is 1, as defined in {IEEE 754-2008|http://en.wikipedia.org/wiki/IEEE_754-2008}.
+* Early out for negative one exponent with a division.
+* Domain error checks to prevent division by zero.
+* Negative exponents result in division.
+* Negative integer bases properly negate result based on exponent oddness.
+* Non-integer negative bases result in domain error.
+
+I couldn't find anything other than quick/hacky implementations that failed to take account of many of the issues above. Given that I'm using 3rd party libraries and don't want to be caught out by unexpected inputs. Error handling wasn't important for now - what was important was that any errors in input were handled predictably. As such, I return zero in error conditions without setting any form of error flags. I will address these issues at a later date.
+
+To be fair, FPU programming for the x87 class of co-processors is tedious - I love assembly programming but this somehow grinds on me. However, the FPU has some surprisingly robust instructions that can be used for many purposes in what I can only guess is a great attempt at saving silicon.
+
+Implementing a pow function requires expressing --r=x^y-- as --r=2^(y.log2(x))--, a feat achieved using the {FYL2X|http://siyobik.info.gf/main/reference/instruction/FYL2X}, {F2XM1|http://siyobik.info/main/reference/instruction/F2XM1} and {FSCALE|http://siyobik.info/main/reference/instruction/FSCALE} instructions. My complete implementation, along with detailed explanation of what's going on is below:
+
+[code]
+extern "C" __declspec(naked) void _CIpow()
+{
+	// st0 = y, st1 = x
+
+	__asm
+	{
+		// al = negative exponent, ah = negative result from odd negative exponent
+		push eax
+		push ebx
+		mov al, 0
+		mov ah, 0
+
+		// Check for exponent of 0
+		fldz
+		fcomip st(0), st(1)
+		jne exp_not_0
+
+		// Return 1
+		fstp st(0)
+		fstp st(0)
+		fld1
+		jmp exit_fn
+
+	exp_not_0:
+
+		// Check for exponent of 1
+		fld1
+		fcomip st(0), st(1)
+		jne exp_not_1
+
+		// Return x
+		fstp st(0)
+		jmp exit_fn
+
+	exp_not_1:
+
+		// Do further checks if base is 0
+		fldz
+		fcomip st(0), st(2)
+		jne base_not_0
+
+		// Check for positive exponent
+		fldz
+		fcomip st(0), st(1)
+		jle exp_less_equal_zero
+
+		// Return 0
+		fstp st(0)
+		fstp st(0)
+		fldz
+		jmp exit_fn
+
+	exp_less_equal_zero:
+
+		// Check for exponent of 0
+		fldz
+		fcomip st(0), st(1)
+		jne exp_less_zero
+
+		// 0^0 defined as 1 in IEE 754-2008
+		fstp st(0)
+		fstp st(0)
+		fld1
+		jmp exit_fn
+
+	exp_less_zero:
+
+		// Domain error if x=0 and y<0 (division by zero), just return 0
+		fstp st(0)
+		fstp st(0)
+		fldz
+		jmp exit_fn
+
+	base_not_0:
+
+		// Check for exponent of -1
+		fld1
+		fchs
+		fcomip st(0), st(1)
+		jne exp_not_minus_1
+
+		// Return 1/x
+		fstp st(0)
+		fld1
+		fdiv
+		jmp exit_fn
+
+	exp_not_minus_1:
+
+		// Check for negative exponent
+		fldz
+		fcomip st(0), st(1)
+		jge exp_positive
+
+		// Make the exponent positive and record its sign
+		fchs
+		mov al, 1
+
+	exp_positive:
+
+		// Check for negative base
+		fldz
+		fcomip st(0), st(2)
+		jge base_positive
+
+		// Check to see if the exponent is an integer
+		fld st(0)
+		frndint
+		fcomip st(0), st(1)
+		je exp_integer
+
+		// Domain error with negative base and non-integer exponent, just return 0
+		fstp st(0)
+		fstp st(0)
+		fldz
+		jmp exit_fn
+
+	exp_integer:
+
+		// Negate final result based on oddness of exponent
+		sub esp, 4
+		fist [esp]
+		mov ah, [esp]
+		and ah, 1
+		add esp, 4
+
+	base_positive:
+
+		//
+		// Calculating:
+		//
+		//    r = x^y
+		//
+		// Construct logarithm equivalent:
+		//
+		//    log.x(r) = y
+		//
+		// Change to base 2:
+		//
+		//    log2(r)
+		//    ------- = y
+		//    log2(x)
+		//
+		// Re-arrange to make r the dependent:
+		//
+		//    log2(r) = y.log2(x)
+		//
+		// Invert the dependent logarithm:
+		//
+		//    r = 2^(y.log2(x))
+		//
+
+		// st0 = y.log2(x)
+		fxch
+		fyl2x
+
+		//
+		// Assuming the result is in R, now need to calculate 2^R
+		// The f2xm1 instruction will do this with values in the range [-1,1]:
+		//
+		//    f2xm1 = 2^st0 - 1
+		//
+		// R needs to be split into its integer and fractional parts to allow use of this instruction:
+		//
+		//    2^R = 2^(int(r) + frac(r)) = 2^int(R) . 2^frac(R)
+		//
+		// And then finally, fscale can be used to calculate 2^int(R) and multiply by the result of f2xm1
+		//
+
+		// st0 = frac(R), st1 = int(R)
+		fld st(0)
+		frndint
+		fsub st(1), st(0)
+		fxch
+
+		// st0 = 2^frac(R)
+		f2xm1
+		fld1
+		fadd
+
+		// st0 = st0.2^int(R)
+		fscale
+
+		// Leave result on the top of the FP stack
+		fwait
+		fstp st(1)
+
+		// Negative exponent is a division
+		cmp al, 1
+		jne exp_positive_2
+		fld1
+		fdiv
+	exp_positive_2:
+
+		// Use oddness of negative exponent to determine final sign
+		cmp ah, 1
+		jne neg_base_even
+		fchs
+	neg_base_even:
+
+	exit_fn:
+		pop ebx
+		pop eax
+		ret
+	}
+}
+[/code]
+
+The latest Visual C compilers contain SSE implementations of this function which are faster but lower precision. As I'm working with physics at a planetary scale, I'm erring on the side of accuracy over performance at this early stage. However, it's much more enjoyable to work with SSE so I will definitely revisit this later (at which point I'll probably be more interested in {approximations|http://www.dctsystems.co.uk/Software/power.html}).
+
+My journey with this kind of code has been a long one with many surprising detours (sprintf was a monster). At some point I'd like to open source the small CRT I've written, along with the browser technology. Hopefully I'll have the time to clean it up at a later point.
+
+[disqus][/disqus]

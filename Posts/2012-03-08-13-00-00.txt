@@ -1,0 +1,346 @@
+
+<<Cross-browser, Native/Remote D3D Rendering with C++>>
+
+As my little game project builds steam and I become more confident that it will actually work, it's becoming easier for me to talk about the various problems I've had to tackle.
+
+A little background on my setup will probably help here. I have two main programs to write: the client and server. The client is a webpage, written primarily in Javascript and the server is your typical CPU/GPU-intensive game program written in C++.
+
+For now, the two communicate via a custom {clReflect|clReflect}-based protocol over the TCP/IP stack (localhost). This allows me to iterate on one or the other without taking the other down and makes debugging far easier. Mainly, it avoids the pain of embedding every single bit of my code behind the JNI wall of doom that loves to crash itself out of existence without leaving trace of what your code did wrong. At a later date, I may go into the pain I've had trying to get (and failing) the JVM to release applet references so that I could reload my code on the fly.
+
+The final shipping version will not do that as it's a big security hole and requires the user to allow the communication via their firewall when they first run the application. Not a good first impression.
+
+
+== How does Minecraft do this? ==
+
+Under the hud, one of the great things about {Minecraft|http://www.minecraft.net/} is that it uses the native C++ library {JOGL|http://jogamp.org/jogl/www/} to use the OpenGL API for its rendering. This is a very practical, cross-browser/platform means of getting great visuals for a game in your browser. 
+
+JOGL has various ports for Windows, Mac OSX and Linux but I'll only talk about Windows here. The first task it needs to achieve is initialising an OpenGL context with a window handle, typically:
+
+[code]
+// Get window handle and device context from somewhere
+HWND hWnd = ...;
+HDC hDC = GetDC(hWnd);
+
+// Initialise a pixel format
+PIXELFORMATDESCRIPTOR pfd;
+...
+...
+
+// Set on the device context
+int format = ChoosePixelFormat(hDC, &pfd);
+SetPixelFormat(hDC, format, &pdf);
+
+// Create the render context
+HGLRC wglCreateContext(hDC);
+[/code]
+
+The basic requirement of having a window handle for display is similar to D3D. For this post, I'm going to reference D3D9 as that is what I'm most comfortable with:
+
+[code]
+// Create the D3D object
+IDirect3D9* d3d = Direct3DCreate(D3D_SDK_VERSION);
+
+// Create a D3D device using a window handle from somewhere
+D3DPRESENT_PARAMETERS d3dpp;
+d3dpp.hDeviceWindow = ...;
+...
+...
+IDirect3D9* device = 0;
+d3d->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, 0, D3DCREATE_HARDWARE_VERTEXPROCESSING, &d3dpp, &device);
+[/code]
+
+Alternatively, with D3D, you can specify the window handle at a later point in the {Present|http://msdn.microsoft.com/en-us/library/windows/desktop/bb174423(v=vs.85).aspx} call, instead of binding it to the device at such an early point (allowing you to target multiple windows easily).
+
+So where does the window handle come from?
+
+You start by embedding a Java applet in your browser and compiling your render code to a DLL using some {Java JNI|http://docs.oracle.com/javase/1.5.0/docs/guide/jni/} entry-points. To load native code, your Java applet must also be signed. How you load native code in an applet and sign it is beyond the scope of this article but here are some links which you may find useful:
+
+* {Java Applet Tutorial|http://profs.etsmtl.ca/mmcguffin/learn/java/}
+* {JNI + JAR + Applet|http://vkessels.home.xs4all.nl/articles/jnijarapplet.html}
+* {JNI-C++ Integration Made Easy|http://drdobbs.com/184401335} on Dr. Dobb's.
+* {Signed Applet Tutorial|http://www-personal.umich.edu/~lsiden/tutorials/signed-applet/signed-applet.html}
+
+Assuming you have an applet setup and a {canvas|http://docs.oracle.com/javase/1.4.2/docs/api/java/awt/Canvas.html} created over the applet (applets themselves are canvases), you need to get the native window handle of the applet and pass it over to the rendering code.
+
+This can be done quite simply using the little {AWT Native Interface|http://download.oracle.com/javase/1.3/docs/guide/awt/AWT_Native_Interface.html} library (JAWT). This has implementations for each platform but on Windows, allows you to get a window handle by doing:
+
+[code]
+// JNI & JAWT headers
+ #include <jni.h>
+#include <jawt.h>
+#include <jawt_md.h>
+
+extern "C" JNIEXPORT void JNICALL Java_NativeGame_InitRendering(JNIEnv* env, jobject, jobject canvas)
+{
+	// Get the AWT
+	JAWT jawt;
+	jawt.version = JAWT_VERSION_1_4;
+	if (JAWT_GetAWT(env, &jawt) == JNI_FALSE)
+		return 0;
+
+	// Get the drawing surface
+	JAWT_DrawingSurface* ds = jawt.GetDrawingSurface(env, canvas);
+	if (ds == 0)
+		return 0;
+
+	// Lock the drawing surface
+	if ((ds->Lock(ds) & JAWT_LOCK_ERROR) != 0)
+	{
+		jawt.FreeDrawingSurface(ds);
+		return 0;
+	}
+
+	// Get the drawing surface info
+	JAWT_DrawingSurfaceInfo* dsi = ds->GetDrawingSurfaceInfo(ds);
+	JAWT_Win32DrawingSurfaceInfo* dsi_win = (JAWT_Win32DrawingSurfaceInfo*)dsi->platformInfo;
+	HWND hwnd = dsi_win->hwnd;
+
+	// Release all resources
+	ds->FreeDrawingSurfaceInfo(dsi);
+	ds->Unlock(ds);
+	jawt.FreeDrawingSurface(ds);
+
+	//
+	// Pass HWND onto your rendering initialisation code...
+	//
+}
+[/code]
+
+Your Java applet would call this on initialise and call your render function whenever it receives a {paint|http://docs.oracle.com/javase/1.4.2/docs/api/java/awt/Canvas.html#paint(java.awt.Graphics)} request.
+
+This technique is used by a few other libraries:
+
+* {LWJGL|http://www.lwjgl.org/}
+* {JebGL|http://code.google.com/p/jebgl/}
+* {DirectX4Java|http://code.google.com/p/directx4java/}
+* {Java-Direct3D wrapper|http://sourceforge.net/projects/java-direct3d/}
+
+In Minecraft's case, OpenGL calls are generated on the JVM-side and shuffled over to C++ by JOGL at a pretty low level. Your level of abstraction is entirely up to you but security, above all, must be a primary concern.
+
+
+== Interaction with Overlayed Browser Elements ==
+
+One thing Minecraft didn't have to deal with was overlaying HTML elements on the applet. I need to do this for drop-down menus, pop-ups and drag-and-drop items. If you attempt to drag a HTML element over one of these applet windows then the behaviour will be different based on what browser you're using. Consistently, Firefox is the only browser that works to any acceptable degree. Chrome will render the applet on top of whatever HTML element you choose and will sometimes flash like crazy.
+
+This has been a well-known problem for many years and there is one solution that works very well across the 3 main browsers, however finding descriptions of it has been tough. I have a few references but there is only which is any good and that can only be accessed on the Wayback Machine:
+
+* {Using IFrame Shim to (partly) cover a Java applet|http://web.archive.org/web/20110707212850/http://www.oratransplant.nl/2007/10/26/using-iframe-shim-to-partly-cover-a-java-applet/}
+
+The basic idea is that whenever you create an element that may cover your applet window, you create an iframe element on the fly, attach it to document.body and make sure it covers the region occupied by your element. My code for doing that is:
+
+[code]
+function CreateShimmer(parent)
+{
+	var shimmer = document.createElement("iframe");
+
+	// Position the shimmer so that it's the same location/size as its parent
+	shimmer.style.position = "fixed";
+	shimmer.style.left = parent.style.left;
+	shimmer.style.top = parent.style.top;
+	shimmer.style.width = parent.offsetWidth;
+	shimmer.style.height = parent.offsetHeight;
+
+	// We want the shimmer to be one level below its contents
+	shimmer.style.zIndex = parent.style.zIndex - 1;
+
+	// Ensure it's empty
+	shimmer.setAttribute("frameborder", "0");
+	shimmer.setAttribute("src", "");
+
+	// Add to the document and the parent
+	document.body.appendChild(shimmer);
+	parent.Shimmer = shimmer;
+	return shimmer;
+}
+[/code]
+
+This works really well across Firefox, Chrome and Internet Explorer but there are a couple of problems:
+
+* If you can drag your HTML elements across an applet, trails of the applet background colour will be left behind. You can minimise this by overloading the {update|http://docs.oracle.com/javase/1.4.2/docs/api/java/awt/Canvas.html#update(java.awt.Graphics)} method of your canvas to not call clear, however the iframe interfaction still seems to blitz anything behind it to the background colour with no evident Java means of stopping it. You can make this look a little better by setting your applet background to a similar colour to your element. Setting the iframe to transparent doesn't do anything.
+* You will lose certain elements of CSS3 rendering based on what browser you use. The only way to solve this is to avoid the use of stuff like {border-radius|https://developer.mozilla.org/en/CSS/border-radius} and {box-shadow|https://developer.mozilla.org/en/CSS/box-shadow}. Experiment with what you can use a little; the situation may improve in the future as these are still early implementations of the standard (I'm guessing the problem may be on the Java implementation side).
+
+||{{Images/window_dropshadow_works.gif|Images/window_dropshadow_works.gif}} vs. {{Images/window_dropshadow_broken.jpg|Images/window_dropshadow_broken.jpg}}||
+
+iframe was actually removed from the Strict HTML and XHTML standards but is back with HTML5. Desktop browsers have consistently supported them for many years and there seems no reason for them to be dropped any time soon.
+
+
+== Remote Process Rendering ==
+
+So this is nice and all, but given that my native application is remote and communicates with a thin JNI layer via TCP/IP, it's of no use to me in this form.
+
+Way back in 2002 I was working on some really cool rendering technology that didn't have an accompanying editor so all levels/content were constructed in {Lightwave Layout|http://www.newtek.com/lightwave.html}. We wanted realtime feedback from the engine in the editor but Lightwave had a poor record of making any updates to their Plugin API. At one point we were promised improved API developments specifically for game developers, including a viewport we could render to (not to mention a skinning algorithm that was actually documented). I believe Maya and MAX have had support for such viewports for a long time and I've been so happy not work with the Lightwave API that I've not dared look back since.
+
+We gave up waiting and tried something nefarious. In our plugins, we launched the engine on a separate process, searched for the Lightwave window handle using {EnumWindows|http://msdn.microsoft.com/en-us/library/windows/desktop/ms633497(v=vs.85).aspx} and manually enumerated all the child windows until we found the viewport we wanted to render into. We then passed its handle onto the engine executable which proceeded to render into it.
+
+It worked! As long as we weren't fighting Lightwave for the viewport, this worked amazingly well. I believe the scenarios where Lightwave would render into said viewport became too hard for us to control so we ended up just spawning a separate window to get our real-time feedback.
+
+However, I reused the same technique with success for some of the {Splinter Cell tools|http://altdevblogaday.com/2012/01/03/reflection-in-c-part-2-the-simple-implementation-of-splinter-cell/} back in 2005 and was wondering if it still worked on Windows 7...
+
+It did!
+
+So for a while my JNI code would pass the window handle of the Java applet over the TCP/IP connection and the server would happily render into it. While this is great for quick tools and a proof of concept, it has some drawbacks:
+
+* This is not likely to be a concept that works on all platforms and is entirely unsupported by Microsoft, despite it working for the last 10 years or so.
+* All the hard work put into creating an iframe shim and making HTML elements smoothly move across your applet is undone by the fact that the AWT GUI rendering thread in the applet will be fighting with the rendering thread on the server. The distracting background flashes return.
+
+Making the applet run in lock-step with the server would introduce unnecessary complexity and failure points that I was unhappy with and still wouldn't address the first issue so I needed another solution.
+
+
+== Memory Mapped Files ==
+
+I had to create a means of getting the server frame buffer over to the applet and let the applet render in its AWT GUI thread via paint(). The first step is to get the frame buffer data on the server and that required the use of {GetRenderTargetData|http://msdn.microsoft.com/en-us/library/windows/desktop/bb174405(v=vs.85).aspx}. On D3D9 it is not clear whether this is an async process. There are indications that it merely puts the request into the command buffer and any subsequent calls into the device block until the data is transferred to the CPU, implying that you have to do some useful CPU work while that is going on.
+
+So rather than calling Present at the end of your frame, Ignacio Castaño describes a stable technique for getting async behavior with GetRenderTargetData over on {The Witness blog|http://the-witness.net/news/2010/09/hemicube-rendering-and-integration/}. This works well for me but be aware that it introduces extra latency to the visual feedback of the game. Alternatively, you could switch to the latest D3D to get this behaviour, which is something I'm in the process of doing.
+
+The next step is to create a fast means of transferring that data from the server to the client JNI layer. A TCP/IP transfer, while easy, is out of the question as it will break your data up and introduce all manner of performance issues preventing this from being practical.
+
+{Memory mapped files|http://msdn.microsoft.com/en-us/library/dd997372.aspx} are the perfect IPC mechanism to achieve this on Windows and there are equivalents (or fallbacks) on other platforms. I created a very simple shared memory class that used a view on the system page file to continually keep some frame buffer memory mapped, similar to:
+
+[code]
+core::SharedMemBlock::~SharedMemBlock()
+{
+	UnmapViewOfFile(m_Buffer);
+	CloseHandle(m_FileMappingHandle);
+}
+
+void core::SharedMemBlock::InitServer(const char* name, unsigned int buffer_size)
+{
+	// Create a pagefile-mapped file object 
+	m_FileMappingHandle = CreateFileMappingA(
+		INVALID_HANDLE_VALUE,
+		0,
+		PAGE_READWRITE,
+		0,
+		buffer_size,
+		name);
+
+	// Map a view of the entire file into memory
+	m_Buffer = MapViewOfFile(
+		m_FileMappingHandle,
+		FILE_MAP_ALL_ACCESS,
+		0,
+		0,
+		buffer_size);
+}
+
+void core::SharedMemBlock::InitClient(const char* name, unsigned int buffer_size)
+{
+	// Open an existing mapped file
+	m_FileMappingHandle = OpenFileMappingA(
+		FILE_MAP_ALL_ACCESS,
+		FALSE,
+		name);
+
+	// Map a view of the entire file into memory
+	m_Buffer = MapViewOfFile(
+		m_FileMappingHandle,
+		FILE_MAP_ALL_ACCESS,
+		0,
+		0,
+		buffer_size);
+}
+[/code]
+
+Each frame, the server would lock the offscreen plain surface that held the frame buffer and memcpy the data into one of these buffers. The JNI C++ client could then happily read the frame buffer whenever it needed to.
+
+On the Java applet side, this meant the rendering code looked similar to:
+
+[code]
+public class extends Applet implements Runnable
+{
+	// JNI DLL loader with auto-imported C++ functions
+	NativeGame m_NativeGame;
+
+	// Create a drawable image and get direct access to the pixel data
+	BufferedImage m_FrameBuffer = new BufferedImage(800, 600, BufferedImage.TYPE_INT_ARGB);
+	int[] m_Pixels = ((DataBufferInt)m_FrameBuffer.getRaster().getDataBuffer()).getData();
+
+	Thread m_UpdateThread;
+
+	public void start()
+	{
+		enableEvents(AWTEvent.KEY_EVENT_MASK | AWTEvent.MOUSE_EVENT_MASK | AWTEvent.MOUSE_MOTION_EVENT_MASK);
+
+		// Create an update thread, separate to the applet thread (typical Java applet animation approach)
+		m_UpdateThread = new Thread(this);
+		m_UpdateThread.start();
+	}
+	public void stop()
+	{
+		m_UpdateThread = null;
+	}
+
+	public void run()
+	{
+		// Perform JNI init on the update thread
+		m_NativeGame = new NativeGame();
+
+		while (Thread.currentThread() == m_UpdateThread)
+		{
+			// Do lots of network updates between server/client
+
+			// Request a paint on the AWT GUI thread and sleep for a while
+			// This effectively gives us our input latency to the server
+			repaint();
+			try { Thread.sleep(10); } catch (InterruptedException e) { }
+		}
+	}
+
+	public void paint(Graphics g)
+	{
+		// The main paint function, called from the AWT GUI thread in these scenarios:
+		//
+		//    1. Implementing this prevents the horrible Java logo displaying while the applet initialises.
+		//    2. Whenever windows/elements obscure part of the applet, requiring a partial rebuild of the image.
+		//    3. When the browser window is moved or resized.
+		//    4. When the update thread schedules a paint with a call to repaint().
+		m_NativeGame.CopyFrameBuffer(m_Pixels);
+		g.drawImage(m_FrameBuffer, 0, 0, null);
+	}
+};
+[/code]
+
+The function CopyFrameBuffer is a JNI C++ function that looks like:
+
+[code]
+extern "C" JNIEXPORT void JNICALL Java_NativeGame_CopyFrameBuffer(JNIEnv* env, jobject, jintArray dest)
+{
+	//
+	// This function gets called from the AWT GUI thread, which implies potential contention with the other
+	// JNI functions which get called from the update thread. Be careful here and lock if necessary.
+	//
+	jint* frame_buffer = (jint*)g_MemoryMappedFile->GetBuffer();
+	if (frame_buffer != 0)
+	{
+		// Copy the frame buffer data
+		jint dst_size = env->GetArrayLength(dest);
+		if (dst_size == g_MemoryMappedFile->GetSize())
+			env->SetIntArrayRegion(dest, 0, dst_size, frame_buffer);
+	}
+}
+[/code]
+
+You need to make sure here that you are protected against the incoming byte buffer and source memory mapped file being of different sizes.
+
+So we have a several transfers of the frame buffer data going on here:
+
+* GPU to CPU with GetRenderTargetData.
+* memcpy from the offscreen plain surface to the memory mapped file.
+* memcpy from the memory mapped file into the BufferedImage pixels.
+* Whatever rendering mechanism Java uses to render a BufferedImage to the canvas.
+
+Even with that, I'm not feeling any measurable latency with my kind-of twitchy gameplay. You can remove a memcpy using the D3D9Ex feature of specifying ahead of time where the memory for an offscreen plain surface resides. See this section on {Texture Creation in System Memory|http://msdn.microsoft.com/en-us/library/windows/desktop/bb219800(v=vs.85).aspx}.
+
+
+== Taking this to its Final Conclusion ==
+
+A ideal step now would be to transfer the final frame buffer back to Javascript so that it can be used directly with WebGL or a HTML5 Canvas 2D context. This would fix all of the CSS rendering issues and give trail-free HTML drag-and-drop elements.
+
+However, there are a few problems currently preventing that:
+
+* Communication between Java and Javascript, achieved using {LiveConnect|https://developer.mozilla.org/en/JavaScript/Guide/LiveConnect_Overview} is marshalled at a very high-level. There is no means of sending arbitrary binary data between the two languages beyond arrays or strings and access to these is painfully slow.
+* Modifying canvas pixel data on the Javascript side is very slow currently. You can get nice looking, small window stuff up and running but there is a lack of support for the new {Javascript Typed Arrays|https://developer.mozilla.org/en/JavaScript_typed_arrays} required to accelerate everything. Not to mention the performance of the individual interpreters which may or may not JIT your code on-the-fly.
+
+I tried for hours to get something practical. While the results looked great, they were very slow with different performance problems across all browsers. It's early days, yet and this may get better.
+
+[disqus][/disqus]

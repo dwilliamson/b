@@ -1,0 +1,10 @@
+RewriteEngine on
+RewriteCond %{QUERY_STRING} ^_escaped_fragment_=(.*)$
+RewriteRule ^$ /b/Snapshot/Gazoo.cpp.htm [QSA,L]
+
+RewriteCond %{HTTP_USER_AGENT} “.*Safari.*” [OR]
+RewriteCond %{HTTP:Accept-Encoding} !gzip
+RewriteRule (.*)\.jgz$ $1\.js [L]
+
+AddType “text/javascript;charset=UTF-8″ .jgz
+AddEncoding gzip .jgz

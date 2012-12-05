@@ -1,0 +1,144 @@
+<<Compile-time logarithms in C++>>
+
+Just thought I'd record a quick bit of code that's come in handy just now. Maybe when I get used to this blog thing I'll do this more frequently!
+
+I was writing a 64-bit itoa and needed to figure out how many bytes a specific variable type required when being converted to a string. To start with I just sized the buffer at 20 bytes and moved onto more important things. After I finished the greater task I took a quick break and played around with figuring this out at compile-time. Pragmatically, 20 bytes is enough and any implementation that does this (with bounds checking) will work and will be far easier to understand than what's coming up. It's probably a good point to stop there!
+
+Books such as Modern C++ Design and their accompanying libraries (e.g. {Loki|http://sourceforge.net/projects/loki-lib/}) popularised a technique called {template meta-programming|http://en.wikipedia.org/wiki/Template_metaprogramming}. In their wake, they left a generation of elitist C++ programmers that destroyed code bases worldwide: bringing compilers to their knees, slowing compilation times to a crawl, writing impossible to read code that was a time-sink to port, and made you cry when you tried to step-debug it trying to figure out why it was breaking. Again. I used to be a proud member of those ranks and still haven't paid fully for my sins :)
+
+Templates are {Turing Complete|http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.14.3670} in the sense that you can really express any computational device you can think of if you have an infinite amount time to compile your program in. Some lecturers like to {scare their students|http://matt.might.net/articles/c++-template-meta-programming-with-lambda-calculus/} with examples of such craziness. I won't be taking this post that far. In short: this is just a bit of fun - this code has already been deleted from the library I was writing it in!
+
+==Some code==
+
+I needed an implementation of log10 using integers so we can start with this:
+
+[code]
+int log10(unsigned int val)
+{
+	assert(val != 0 && "Undefined for zero");
+	int res = -1;
+	while (val)
+	{
+		res++;
+		val /= 10;
+	}
+	return res;
+}
+[/code]
+
+Note that the result is undefined at zero and it starts at -1 to give you a result of 0 for the log10 of 1. Algorithms that you want to express as a template metaprogram are generally easier to understand when written recursively:
+
+[code]
+int log10(unsigned int val)
+{
+	assert(val != 0 && "Undefined for zero");
+	if (val / 10)
+		return log10(val / 10) + 1;
+	return 0;
+}
+[/code]
+
+This recurses until it detects that further recursion will trigger the undefined assert. For expressing this as a TMP we have to use data structures that are parameterised by integer template values, using compile-time expression evaluation to generate the result we need. We can start with this:
+
+[code]
+template <unsigned int N> struct log10
+{
+	static const int val = 1 + log10<N / 10>::val;
+};
+
+int a = log10<1>::val;
+int b = log10<10>::val;
+[/code]
+
+Right at the point that the log10 template tries to evaluate the value of its static integer, it recreates a new parameterised version of itself with N divided by 10. The bigger the value of N, the more times the compiler has to recurse and create new instances of the log10 template type - this is a good example of why even simple TMP can force your compiler to do some serious work and slow your compile times:
+
+[code]
+// Creates 20 new types in one line! (asusming you use __int64 in the code above)
+int itoa_64bit_bytes_size = log10<~(0ULL)>::val;
+[/code]
+
+Of course, the code above won't work when compiled because it will infinitely recurse with a value of N=0, generating an error specific to your compiler. To fix this you need to specialise the template for values of 0 so that recursion ends:
+
+[code]
+template <> struct log10<0>
+{
+	static const int val = -1;
+};
+[/code]
+
+It works as advertised! Except that doing a log10 of zero returns -1. You could assume that means undefined or further use templates to raise an error at compile-time if you misuse the template. One simple way of doing this would be to not store any value in the specialised struct when N=0. This would catch your error but would also raise an error when the main log10 struct finishes recursing - all the time! Instead, you could introduce another type:
+
+[code]
+template <unsigned int N> struct log10_impl
+{
+	static const int val = 1 + log10_impl<N / 10>::val;
+};
+template <> struct log10_impl<0>
+{
+	static const int val = -1;
+};
+template <unsigned int N> struct log10
+{
+	static const int val = log10_impl<N>::val;
+};
+template <> struct log10<0>
+{
+};
+
+// Works
+int a = log10<1>::val;
+
+// Raises a compile-time error - 'val' is missing
+int b = log10<0>::val;
+[/code]
+
+This could be classed as complete. When you get further into TMP you start building a library of tools and concepts, similar to the {Boost MPL Library|http://www.boost.org/doc/libs/1_47_0/libs/mpl/doc/}. In such cases, code like the above log10 begin to look eerily procedural. For example, in the C++ version we had the luxury of being able to check the result of the division before we recursed for a final time - this can be achieved with templates, too!
+
+To do this we can introduce the concept of the Template If Statement:
+
+[code]
+template <bool EXPR, typename IF_TRUE, typename IF_FALSE> struct If
+{
+	typedef IF_TRUE res;
+};
+template <typename IF_TRUE, typename IF_FALSE> struct If<false, IF_TRUE, IF_FALSE>
+{
+	typedef IF_FALSE res;
+};
+[/code]
+
+This uses partial template specialisation - a concept that is very useful in type libraries for figuring out if a given type is a pointer, reference, CV-qualified, etc. In this situation it can be used as follows:
+
+[code]
+template <int N>
+struct Int
+{
+	static const int val = N;
+};
+
+template <unsigned int N> struct log10
+{
+	static const int val = 1 +
+		If<(N / 10) != 0,
+			log10<N / 10>,
+			Int<-1> >::res::val;
+};
+template <> struct log10<0>
+{
+};
+[/code]
+
+This still performs recursion and still maintains the ability to force a compile-error when used incorrectly, all within one type. The Int type would be part of your TMP library, making the code visually a little more concise to the seasoned TMP developer, but a little more hairy for others. The key concept to grasp is that that log10 is not recursively instantiated until the compiler needs access any of its members; in this case, res. If the result of the N/10 expression is false, the res member from the Int class is used instead and log10 is not instantiated any further.
+
+==Closing words==
+
+This is just scratching the surface of what is possible. By all means, go ahead and learn as much about TMP as you can - you will encounter million line plus codebases that contain some real horrors that you might one day be called upon to fix or even maintain. Get to know all the benefits and drawbacks as you might also have to protect a codebase from designs that could potentially alienate the rest of the programmers on your team. Don't take my word that this will bring the world around you crashing down - try it out for yourself; make your own mistakes in the process of learning it all. Have fun!
+
+Some good links:
+
+{C++ Template Metaprogramming|http://www.boostpro.com/mplbook/} (book)
+{Compile-time linked list|http://www.codeproject.com/KB/recipes/StaticDataStructure.aspx}
+{Floating point arithmetic in C++ templates|http://mi.eng.cam.ac.uk/~er258/code/fp_template.html}
+{What's wrong with C++ templates?|http://www.kuro5hin.org/story/2003/5/26/22429/7674}
+
+[disqus][/disqus]

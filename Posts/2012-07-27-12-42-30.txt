@@ -1,0 +1,69 @@
+
+<<Getting Google to Index AJAX Content>>
+
+I'm stuck on quite a major feature and only have a few hours of time available to work today so I thought I'd take a break and work on something that has been confusing me for a while, now.
+
+I use {TinyBlog|TinyBlog} to write posts/pages on this website and, since it uses jQuery's AJAX functions to dynamically load the posts, Google does not index it. If you dynamically generate content with Javascript, Google can {apparently|http://www.seomoz.org/ugc/can-google-really-access-content-in-javascript-really} {index|http://searchengineland.com/google-can-now-execute-ajax-javascript-for-indexing-99518} {it|http://www.adherewebdesign.com/can-google-index-javascript-generated-content-results/}. AJAX is a no go, however. I know a few people use TinyBlog to host their site so this information should hopefully be useful to you.
+
+The first port of call is the page {Making AJAX Applications Crawlable|https://developers.google.com/webmasters/ajax-crawling/} from Google. It's quite thorough and gives some good general advice. There are a few different routes you can take so I'll just describe the one specific to my site.
+
+
+== Telling Google that you're different ==
+
+The first step I took was to add a --meta-- tag to the head of my HTML file telling Google's crawl bot that I wanted it to index my site in a specific way:
+
+[code]
+	<html>
+		<head>
+			<meta name="fragment" content="!">
+		</head>
+	</html>
+[/code]
+
+When the crawl bot encounters this tag it modifies the URL it used to download your page and performs another request. If the bot initially requested the page --http://donw.org/b/--, it would be modified to --http://donw.org/b/?_escaped_fragment_=-- and requested again. It's then up to you to configure your server to redirect such requests to a HTML snapshot of your page.
+
+Note that if you have a query string somewhere in that URL then it will be preserved appropriately. So, --http://donw.org/b/?d=About-- becomes --http://donw.org/b/?_escaped_fragment_=d=About--. If your snapshot executes Javascript, it might be worth getting it to strip the additional content from the query string before it parses it.
+
+
+== Generating a snapshot ==
+
+This is the simple bit. I just loaded my page in Chrome and saved the full page to disk. Saving it as just HTML didn't capture any of the content so wasn't good enough. I tried Firefox but its full save was about 4 times the size of the Chrome version, however, it did have a very useful save as text feature. If you're concerned about bandwidth, that might be a good option for you.
+
+Alternatively, you can use tools such as {HtmlUnit|http://htmlunit.sourceforge.net/}, {crawljax|http://www.crawljax.com/} or {watij.com|http://www.watij.com/} if you want more control over what your snapshot looks like.
+
+
+== Configuring the server ==
+
+With the snapshot setup, you will need to tell your server to redirect any requests with --_escaped_fragment_=-- in the query string to your snapshot. Not only that, you need to preserve the query string beyond this when redirecting. This can be achieved using the Apache HTTPD {rewrite module|http://httpd.apache.org/docs/current/mod/mod_rewrite.html}.
+
+Assuming this is setup on your server, the first step is to add a --.htaccess-- file to the directory that hosts your blog. There's a great tutorial on controlling these files {here|http://www.javascriptkit.com/howto/htaccess.shtml}. Mine looks like this:
+
+[code]
+RewriteEngine on
+RewriteCond %{QUERY_STRING} ^_escaped_fragment_=(.*)$
+RewriteRule ^$ /b/Snapshot/Gazoo.cpp.htm [QSA,L]
+[/code]
+
+The {RewriteCond|http://httpd.apache.org/docs/current/mod/mod_rewrite.html#rewritecond} directive tells the server to match the URL query string with the provided regular expression. Upon success, the {RewriteRule|http://httpd.apache.org/docs/current/mod/mod_rewrite.html#rewriterule} directive redirects to the snapshot webpage. The --[QSA,L]-- flags tell the server to append the query string and stop executing any more rewrite rules.
+
+
+== Testing that this works ==
+
+The first test is obviously to test the rewrite module works. For example, {http://donw.org/b/?_escaped_fragment_=|http://donw.org/b/?_escaped_fragment_=} should redirect you to --http://donw.org/b/Snapshot/Gazoo.cpp.htm-- with the URL and query string preserved. Hit view source and all your dynamically loaded content should be there.
+
+The next step is to see how the crawl bot views it. You can use Google's {Fetch as Google|http://support.google.com/webmasters/bin/answer.py?hl=en&answer=158587} tool to do this. If you haven't already signed up for the {Webmaster Tools|http://www.google.com/webmasters/tools/} then you need to do so to use it.
+
+The important, undocumented point to realise is that even though the Google crawl bot supports the above --meta-- tag, the Fetch as Google tool does not! When you instruct the tool to fetch your page, instead of typing something like --http://donw.org/b/--, you need to explicitly inform the tool to request the alternative URL. This is done by using --http://donw.org/b/#!-- instead.
+
+Submit the final page for indexing and you're done!
+
+
+== Final words ==
+
+Since the initial version of TinyBlog I've made a lot of modifications, such as {Disqus|http://disqus.com/} comment integration and very simple equation formatting (not submitted to Bitbucket yet, but you can view the source of this page to check out its implementation). The lack of indexing support from Google was one of the really interesting fall-out problems I didn't anticipate and it's taken me until now to sort that out.
+
+The biggest fall-out of them all, however, is the lack of previews in my RSS feed generation. All the content is loaded and formatted on the client in Javascript and as an RSS feed can only be generated offline or by server-side code, I either have to dump previews raw, write a formatting engine in PHP or just get the PHP to strip the formatting.
+
+It all seems a bit redundant and after making a stab at some PHP code which doesn't stress the server file system, I'm almost tempted to ditch all my PHP code and write some offline Python that just does the lot for me. Tempting.
+
+[disqus][/disqus]

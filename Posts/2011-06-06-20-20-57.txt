@@ -1,0 +1,26 @@
+<<Hello!>>
+
+Welcome to my blog :)
+
+In the next couple of weeks I'll be starting my own business in Brighton and couldn't be more excited about it! At the moment, I'm taking a little holiday so my days consist of catching up on sleep, cooking, gardening and an open water diving course.
+
+I've just left Lionhead where I worked on the engine team for Fables 2 & 3 for 3 and a bit years - prior to that I was based in Montreal, working on the Splinter Cell: Conviction engine at Ubisoft. As a 13 year veteran, optimising the work flow of large teams, writing engine/tools code and squeezing every last drop out of the target hardware has always been an obsession of mine.
+
+I've worked with much smaller teams in the past and the key difference between them and the larger teams is that you learn so much, so much faster. This is one of my key motivations for striking out on my own. I've also developed a product idea that I want to bring to prototype level (i.e. the entire product experience is implemented and functional but each part is very roughly implemented).
+
+Not to mention, living in Brighton by the sea and having an office just a few minutes walk from the beach has a draw off its own :)
+
+So my plans are:
+
+* Secure initial funding for up to a year self-employed.
+* Locate some office space in Brighton. I already have some candidates lined up and the prices are pretty good. This is purely going to be desk-space among an open office with other startup developers so that I don't go insane working on my own from home!
+* Spend a month setting up code and development infrastructure.
+* Spend 5 months on the prototype. I'm only really going to give myself a month to exceed the schedule by. The two main goals with this process are to see if the product idea works and if it's achievable with the man power and investment I'll have at my disposal. If not, this is the first point at which I'll consider another product.
+* Demo to as many close friends/developers as possible and see if they "get it." Does the idea make sense? Can it be changed in ways to make more sense?
+* Investigate alternative investment opportunities (absolutely anything helps here - even claiming back tax from HMRC based on an income less than 5k a year).
+* Start investigating the product art style, interface and branding. This will be super important as it will be the first thing people see.
+* Have an alpha/beta product out on the market within 12-15 months. Release as early as possible and continuously update for a period of 2-3 years
+
+I'm in the incredibly lucky position of being able to do all this. Let's see if this all works... :)
+
+[disqus][/disqus]

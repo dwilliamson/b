@@ -1,0 +1,49 @@
+<<A New Year (monster) update>>
+
+I'm writing this post from the comfort of my very large sofa, under a dimmed lamp, while {QI|http://www.qi.com/tv/} plays amusingly on the TV in the background. We finally managed to find a nice house to rent and have slowly got our lives back to normality. And there's an entire year ahead for me to try and get this game out the door! With some of the work we wanted to do on the house we attempted to buy, I'm sure it would have been a huge distraction during a time when I need most focus.
+
+I managed to get approval for part 2 of my {Reflection in C++|http://altdevblogaday.com/2012/01/03/reflection-in-c-part-2-the-simple-implementation-of-splinter-cell/} series on {#AltDevBlogADay|http://altdevblogaday.com/} that managed to get a {Gamasutra|http://www.gamasutra.com/view/news/39500/Reflection_in_C_The_simple_implementation_of_Splinter_Cell.php} reprint. Work on part 3 is progressing well and thankfully won't need any publishing approval, so you should see that very soon.
+
+== Starting from scratch ==
+
+It's been very hard starting this project and working on my own. I'm a much better programmer than I am salesman/designer, so I like to convey my ideas in code before I try to attract other people to work with me. Sounds crazy and it has some downsides.
+
+When you start coding, besides the 3rd party libraries you choose to use, you have nothing. I've been in this situation many times before. Most memorably at a company back in 2002 where I started a code-base that eventually grew to around half a million lines of code, supporting a team of 20 people. However, there comes a point in your career where you get tired of rewriting the same code over and over again. The last 5 years of my career have been dominated by two code bases whose roots can be traced back as far as 1994, and while the teams I've worked on had the freedom to transform them quite significantly, they carried with them an immense library of tools that helped you in your day to day job. Not only that; they provided a platform to make increasingly more sophisticated tools that I can't possibly recreate with the limited resources I have.
+
+At the start, I had several very interesting problems to solve, including:
+
+* How do I get native code in as many browsers as possible with no installation required and transparent updates?
+* How do I make my code as tiny as possible with no required 3rd party installations (such as the MSVC redistributables)?
+* How can I seamlessly perform interop between C++ and Javascript?
+* How do I write a cache-efficient entity/component system, having not written game code for years?
+* How can I get C++ reflection that's non-intrusive, easy to use and not engineered to continually cause me problems when I hit up against its limitations?
+
+{clReflect|clReflect} has proven to be my biggest visible achievement so far. It's helped me solve so many problems very simply and has many more goodies yet to be released. Here's a teaser of how clReflect has helped me with the native code/javascript interop:
+
+{{https://p.twimg.com/AcDD319CMAAfBpj.jpg|https://p.twimg.com/AcDD319CMAAfBpj.jpg}}
+
+Since I took the screenshot, the process has simplified further and it's a joy to use. Once the game becomes public and I've eased my paranoia, I'll write a few posts on the rest of the stuff.
+
+One other thing I'm missing is being able to find inspiration in those around me. Working on {Fable 3|http://marketplace.xbox.com/en-US/Product/Fable-III/66acd000-77fe-1000-9115-d8024d5308d6}, {Fable 2|http://marketplace.xbox.com/en-US/Product/Fable-II/66acd000-77fe-1000-9115-d8024d5307f1} and {Splinter Cell|http://splintercell.ubi.com/conviction/} and some of the stuff after that was an amazing experience; there were so many artists, designers and programmers who would create crazy stuff on a daily basis that would just blow you away.
+
+Either way, I'm now at a point where the core fundamentals of the gameplay/experience are functional and everything is starting to look like something people would actually enjoy using. This is such a huge boost and I find myself disconnecting my internet connection at work so that I have no distractions and can focus entirely on the project.
+
+== The code ==
+
+I've been searching for months for a look to the game world that would make it unique. I'm no artist or art director and I'll be leaving the large majority of that to somebody else, but looking at {Minecraft|http://www.minecraft.net/}, it's obvious that the technology dictates the starting point for the art direction in a very unique way.
+
+The rendering engine for my game is very rudimentary at the moment, but I'm getting to the point where I'll need to settle on the core technology that drives it. I **think** I've finally settled on what I'm going to do and have a few experiments to run through before I make that choice. But it's looking promising.
+
+I've spent the last month knee-deep in HTML5, the canvas element, CSS, javascript and cross-browser compatibility issues. To start with, it was a chore, but now that I'm getting to know the quirks of each browser and the DOM, I'm enjoying it and feel a lot more confident. This has resulted in some pretty cute user interface elements.
+
+I've always loved Javascript but have never really found an application for it since the DOM put me off considerably. It's easy to get optimal, cross-browser 2D canvas rendering at the moment - obviously a sign of the more coherent standardisation initiative. But CSS and HTML is still awful. There are times where I switch to canvas rendering for UI elements, rather than going through HTML/CSS.
+
+WebGL is very cool but for the kind of thing I'm doing, not optimal. However, I will be using it in some very dastardly ways to achieve stuff that would otherwise require me to package huge libraries with the download.
+
+The biggest help has been {Firebug|http://getfirebug.com/}. Once I figured out how to use the console and inspect the structure of the page at runtime, it opened up a lot of closed doors. Another thing it's fantastic for is figuring out how webpages do what they do. (I also wrote a {hack|http://codepad.org/k1sLkkYu} to make debugging a little less painful while iterating on code).
+
+The months before that were spent writing physics code and spending many days iterating on just a few lines of code to get gameplay that's in some way "fun". I haven't done this kind of code for years and it's been very easy for me to focus on it too much, rather than have the experience to realise I need to move on and concentrate on other things. Engine and game code are difficult for very different reasons, and I'm really enjoying finding out what makes game code tick these days.
+
+So that's it for now... I'll try to write posts with more frequency and openness as I get confident nobody is going to get to this idea before I do :)
+
+[disqus][/disqus]

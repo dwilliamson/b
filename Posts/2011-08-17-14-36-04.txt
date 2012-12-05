@@ -1,0 +1,11 @@
+<<Introducing clReflect - C++ Reflection with clang>>
+
+Over the last few weeks I've been working, advisable or not, on what I think is a pretty reliable way of generating and using Reflection information for programs written in C++. The result is {clReflect|clReflect} - part self-indulgence, mostly incredibly useful for what I'm currently working on!
+
+It's by no means finished but it's reached the first releasable milestone that I'm not afraid to show. There are so many uses for this, which I will cover in future blog posts.
+
+I've been writing Reflection APIs for many years and try to shoe-horn them in on whatever project I'm working on (Splinter Cell: Conviction being by far the most successful example - more info {here|http://donw.org/rfl}). This will hopefully settle my angst at not having a decent C++ solution and stop me writing them forever more :)
+
+Check it out, let me know what you think and if you can lend a hand, please do!
+
+[disqus][/disqus]

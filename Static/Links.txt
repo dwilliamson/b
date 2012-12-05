@@ -1,0 +1,25 @@
+[lit]<div style="font-size:8pt; line-height:1.3em;">[/lit]**Links**
+{Angelo Pesce|http://c0de517e.blogspot.com/}
+{Aras Pranckevicius|http://aras-p.info/blog/}
+{Bartosz Milewski|http://bartoszmilewski.wordpress.com/}
+{Chad Austin|http://chadaustin.me/}
+{Christer Ericson|http://realtimecollisiondetection.net/blog/}
+{Corensic|http://blog.corensic.com/}
+{Dan Piponi|http://blog.sigfpe.com/}
+{debugmode|http://debugmo.de/}
+{Eric Lippert|http://blogs.msdn.com/b/ericlippert/}
+{Glenn Fiedler|http://gafferongames.com/}
+{Herb Sutter|http://herbsutter.com/}
+{Jeremy Shopf|http://www.jshopf.com/blog/}
+{Johan Andersson|http://repi.blogspot.com/}
+{Kyle Hayward|http://graphicsrunner.blogspot.co.uk/}
+{Lambda the Ultimate|http://lambda-the-ultimate.org/}
+{Maciej Sinilo|http://msinilo.pl/blog}
+{Marco Salvi|http://pixelstoomany.wordpress.com/}
+{Naty Hoffman|http://renderwonk.com/blog/}
+{Physics Animation|http://animationphysics.wordpress.com/}
+{Real-Time Rendering|http://www.realtimerendering.com/blog}
+{Stefan Kamoda|http://copypastepixel.blogspot.com/}
+{Steve Hill|http://blog.selfshadow.com/}
+{Timothy Farrar|http://farrarfocus.blogspot.com/}
+{Tom Forsyth|http://home.comcast.net/~tom_forsyth/blog.wiki.html} [lit]</div>[/lit]

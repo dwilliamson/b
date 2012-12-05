@@ -1,0 +1,1 @@
+{Home|} | {About|About} | {PiB|PiB} | {Tiny Blog|TinyBlog} | {clReflect|clReflect} -- {<span style="position:absolute;right:40px;color:#AA2222;font-weight:bold;">Gazoo.cpp - Don Williamson</span>|} --

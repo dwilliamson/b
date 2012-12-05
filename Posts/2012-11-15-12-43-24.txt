@@ -1,0 +1,56 @@
+<<Star: Scale, Physics and Shading>>
+
+My goal for this project is to run in a browser with no installation steps required. This means I can't rely on any software on the host machine that needs to be installed by hand. I also wanted the executables to be as small as possible so that I could ship regular updates and limit the amount of bandwidth I have to pay for.
+
+== The Build System ==
+
+After roughly 12 years of working within the MSVC build system and seeing multiple very large projects crumble under the weight of required maintainence, I decided to go for another build system. Because I wanted to use {clReflect|https://bitbucket.org/dwilliamson/clreflect}, individual build steps needed to be configurable. {This post|2011-06-28-17-04-00} explains a little bit on why I decided to make my own build system.
+
+The result was {PiB|https://bitbucket.org/dwilliamson/pib}. It's served me well, but the first few months threw up its fair share of bugs. I use this to build all the code across all languages, including generating shader code permutations.
+
+== The Base Libraries ==
+
+The first code step was building my own custom C Runtime Libraries (CRT). Programs built by MSVC can link statically with their own or dynamically with versions installed on the host machine. The former approach leads to large executable sizes and repeat updates of a large portion of the same code on each update. The latter requires users to install MSVC redistributables.
+
+I started with {Matt Pietrek's|http://msdn.microsoft.com/library/bb985746.aspx} articles/code as a base, extended it with some of the work in the {Tiny CRT|http://www.codeproject.com/Articles/15156/Tiny-C-Runtime-Library} and added a whole host of my own modifications. This included:
+
+* An sprintf implementation (relies on David Gay's {dtoa|http://www.netlib.org/fp/dtoa.c}).
+* Lots of custom floating point math utilities (including an implementation of {__CIpow|2012-05-15-10-36-23}).
+* Some platform-optimised implementations of memset, memcpy, etc. as I wanted to work in debug builds as much as possible.
+* A lot of missing functionality to bring the library up to the code generation level the latest MSVC.
+* Functions required to emulate 64-bit arithmetic (e.g. _aulldiv).
+* Exception handling and buffer overrun detection support.
+
+All this gave me the benefit of a tiny executable, no host machine dependencies and a single header file to access all the CRT features I needed (this also benefits compile times).
+
+On top of that, I added my own version of windows.h, a little trick I used on {Splinter Cell: Conviction|http://www.altdevblogaday.com/2012/01/03/reflection-in-c-part-2-the-simple-implementation-of-splinter-cell/}. This can cut the compilation of an individual file from 3s to as little as a tenth of a second as its a single header file with nothing but forward declarations and type definitions. (The latest Splinter Cell apparently no longer does this because it became a pain to maintain - I shall have to see if it does for me, too)
+
+== The Prototype ==
+
+The next step was some interaction! I set out on a 6 month prototyping adventure, with the goal of testing as many of the risky aspects of my game idea as possible, so visuals were far from being a priority. However, a playing area looks a bit dull without a little bit of lighting! The first thing I did was calculate normals for the heightfield and do some basic N.L shading based on some arbitrary light direction:
+
+||{{http://farm9.staticflickr.com/8205/8185789044_de638341d1.jpg|url:http://www.flickr.com/photos/donw/8185789044/}}||
+
+The sky colour was initially red so that I could flicker between two different colours to double-check presenting to the window was working. Normals were calculated directly from the heightfield and I think its size was around 1024x1024 - I can't remember exactly.
+
+As I didn't want to spend any time loading assets and wanted to get to the gameplay challenges as soon as possible, I added a few primitive generators:
+
+||{{http://farm9.staticflickr.com/8207/8185749175_b0d46a6126.jpg|url:http://www.flickr.com/photos/donw/8185749175}}||
+
+These were just simple primitives, such as spheres, planes, cubes, cylinders, cones and a whole bunch of others that would try to render as strips; the plan was to use them as gameplay avatars during prototyping. For some reason I also changed the resolution to something like 640x480 (it may have been to test out some aspect ratio code).
+
+After that I started work on an entity component system that was concurrency-friendly. I might discuss more of this in future posts but it's pretty awesome to work with (took a while to settle on a simple design). It works by gathering all components of a specific type in a frame and updating them: great for your code/data cache and seems to result in much more understandable code.
+
+== Physics and Collision ==
+
+I've written several physics and collision detection systems in the past and was well aware of the amount of effort it takes to make something robust. It was thanks to that experience that I decided to go with {Bullet|http://bulletphysics.org/wordpress/} and not write my own. I will admit; at one point I was considering it, just "for fun." I'm so glad I didn't!
+
+I hooked up Bullet in its own DLL, for which updates should be very, very rare (and it isolates me from any excessive code build times associated with a large project such as that). I also made Bullet use my custom CRT, changes I've not yet submitted patches for (a CRT-independent Bullet would definitely aid its portability):
+
+||{{http://farm9.staticflickr.com/8349/8185789362_b827e6d3cd.jpg|url:http://www.flickr.com/photos/donw/8185789362}}||
+
+This image shows the physics hooked up to the game, with a custom heightfield collider. The existing Bullet collider doesn't correctly account for internal edges and I wrote {a post|http://bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=7498} about my solution so that others may benefit.
+
+I also added a little tri-planar procedural texture so that I could visually gauge the movement of objects. This becomes more useful when I start working on the character locomotion, which I'll talk about next time!
+
+[disqus][/disqus]

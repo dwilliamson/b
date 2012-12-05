@@ -1,0 +1,272 @@
+<<clReflect - Natural C++ Reflection with clang>>
+
+clReflect uses the incredible {clang|http://clang.llvm.org/} frontend for {LLVM|http://www.llvm.org/} to parse C++ and automatically derive a light-weight Reflection database that can be loaded and used as you please at runtime. Some of the features include:
+
+* Reflection of: basic types, enums and their constants, classes/structs and their fields, functions/methods and their parameters, templates and their instances, namespaces; collectively known as "primitives".
+* An attribute language for tagging primitives with whatever data you want in the form of integers, floats, symbols and strings.
+* Class/struct member offsets calculated automatically.
+* Function addresses parsed from map files.
+* A very light-weight, cross-platform C++ API for accessing the database with a memory-mapped disk representation for speedy loading.
+* A set of Reflection Specs for isolating what you want reflected, allowing you to reflect 3rd party APIs non-intrusively.
+* Hash-based naming of all primitives so that all strings can be removed for final builds.
+
+I built this project for the commercial products I'm working on and will be constantly updating it. I will be using this for many things, including:
+
+* Versionable, automatic serialisation of all my game objects.
+* Network serialisation.
+* Cross-language communication and script binding.
+* User interface building.
+* Live C++ code editing.
+* Debug tools.
+
+As the project is in its very early stages, the documentation is intentionally not very complete. However, the --clReflectTest-- project in the source distribution has complete examples of all the supported features and will always be updated when new changes come online.
+
+
+==Getting the files==
+
+* The latest release of clReflect can be downloaded {here|https://bitbucket.org/dwilliamson/clreflect/downloads}. This contains the compiled tools and C++ API.
+* If you don't want to download it, you can browse the release {here|https://bitbucket.org/dwilliamson/clreflect/src/tip/release/}.
+* The full source code to the tools and C++ API can be viewed/downloaded from {here|https://bitbucket.org/dwilliamson/clreflect/src}.
+
+clReflect executables are currently built with Visual Studio 2005 SP1 on Windows 7. To run them you need to first install the {Microsoft Visual C++ 2005 SP1 Redistributable Package (x86)|http://www.microsoft.com/download/en/details.aspx?id=5638}.
+
+
+==How does it work?==
+
+clReflect contains three key tools:
+
+* **clscan**: Parses a single C++ file and all its included headers, writing a database of reflected information to an intermediate format.
+* **clmerge**: Gathers many intermediate databases output from **clscan**, merges them and writes the result back to a database of the same format.
+* **clexport**: Takes a single intermediate database, links all symbols together and exports it to whatever format is specified. Currently only C++ is supported.
+
+The C++ API is responsible for loading whatever **clexport** writes and presenting the information to the programmer.
+
+How and where you place **clscan** in your build pipeline is up to you. I use some very simple {PiB|https://bitbucket.org/dwilliamson/pib/src/tip/Python/clReflect.py} build nodes which ship as part of the default PiB distribution. You can checkout how they're used to build the test project in the clReflect source distribution. Ideally you only want to call **clscan** for C++ files that have changed or their dependencies have changed.
+
+The simplest option is to create a new project in your build system that loops through all your C++ files and calls **clscan** when things change.
+
+Data member offsets are calculated using clang's internal MSVC layout engine - if clReflect is ported this will need to use the layout engine specific to the platform. Function addresses can be parsed from the map file you pass to **clexport** - this is not a requirement; it just means the exported database will contain function descriptions without addresses.
+
+Once you have an exported database you need to load it from disk or wherever you want to store it. You can construct as many databases as you want and load them from whatever source you choose - the C++ API has no CRT or other external library dependencies. To load a database you must specify file and allocator objects by implementing --IFile-- and --IAllocator--, as shown below:
+
+[code]
+#include <clcpp/clcpp.h>
+#include <cstdio>
+#include <malloc.h>
+
+class CStdFile : public clcpp::IFile
+{
+public:
+	CStdFile(const char* filename) : m_FP(0)
+	{
+		m_FP = fopen(filename, "rb");
+		if (m_FP == 0)
+			return;
+	}
+
+	~CStdFile()
+	{
+		if (m_FP != 0)
+			fclose(m_FP);
+	}
+
+	bool IsOpen() const
+	{
+		return m_FP != 0;
+	}
+
+	bool Read(void* dest, int size)
+	{
+		return fread(dest, 1, size, m_FP) == size;
+	}
+
+private:
+	FILE* m_FP;
+};
+
+struct Malloc : public clcpp::IAllocator
+{
+	void* Alloc(unsigned int size)
+	{
+		return malloc(size);
+	}
+	void Free(void* ptr)
+	{
+		free(ptr);
+	}
+};
+
+int main()
+{
+	// Open the file
+	CStdFile file("database.cppbin");
+	if (!file.IsOpen())
+		return 1;
+		
+	// Load the database
+	Malloc allocator;
+	clcpp::Database db;
+	if (!db.Load(&file, &allocator))
+		return 1;
+	
+	// Do some work!
+	
+	return 0;
+}
+[/code]
+
+You only need to implement the --Read-- method in the --clcpp::IFile-- interface for whatever storage strategy you choose.
+
+
+==Tagging primitives for Reflection==
+
+Primitive reflection is achieved through the use of Reflection Specs and the simplest way to reflect everything would be:
+
+[code]
+crcpp_reflect(TestNamespace)
+namespace TestNamespace
+{
+	void FreeFunction(int x);
+	
+	enum OuterEnum { ZERO, ONE, TWO };
+	
+	template <typename TYPE> struct TestContainer
+	{
+	};
+	
+	class TestClass
+	{
+	public:
+		enum InnerEnum { ZERO, THREE = 3 };
+		
+		void Method(OuterEnum e);
+	private:
+		int m_SomeData;
+		TestContainer<int> m_SomeContainer;
+	};
+}
+[/code]
+
+This will add everything in --TestNamespace-- to the database. --crcpp_reflect-- requests must include the fully-scoped name of the primitive and must always be called from the global namespace. If you wanted to just reflect --TestClass-- you could do this, instead:
+
+[code]
+crcpp_reflect(TestNamespace::TestClass)
+[/code]
+
+This will end up adding --TestNamespace-- to the database as it needs that to store the information for --TestClass--. However, --FreeFunction-- and --OuterEnum-- won't be added. This behaviour allows you to partially reflect primitives if you need to.
+
+
+==Constructor/Destructor linking==
+
+The --clcpp::Class-- type can contain pointers to the constructor and destructor but this isn't the default behaviour. To enable this, you need to call --crcpp_impl_class-- for each type you want this on:
+
+[code]
+crcpp_impl_class(TestNamespace::TestClass)
+[/code]
+
+This needs to be called from the global namespace after the type has been defined, ideally in a C++ file as opposed to a header file. It is essential to remember if you end up using clReflect for serialisation where you need to do something similar to:
+
+[code]
+// Read the unique type ID hash code and lookup the class
+ unsigned int class_id = Read(file, sizeof(unsigned int));
+clcpp::Class* class_ptr = db.GetType(class_id)->AsClass();
+
+// Allocate an object of that type and call its constructor
+void* object = AllocMem(class_ptr->size);
+clcpp::CallFunction(class_ptr->constructor, object);
+[/code]
+
+I'm in the habit of doing this for all types.
+
+
+==Using Attributes==
+
+Attributes are a feature of higher level languages that allow you tag your primitives with useful information, such as: is this a transient variable, does this need to be network replicated, a useful UI description, a version number, etc. There are four types of supported attributes:
+
+[code]
+struct Test
+{
+	crcpp_attr(some_flag, some_int = 3, some_float = 2.3, a_symbol = test, description = "some random text")
+	int x;
+};
+[/code]
+
+Attributes can be added to enums, classes, functions and data members and you can have as many as you need. Flag attributes are simply a name. Integer attributes are a name/integer value pair. Float attributes are a name/float value pair. Symbol attributes are resolved to hash values for quick runtime comparison. String attributes store the full strings for runtime lookup.
+
+
+==Using the database at runtime==
+
+Once loaded the database can be traversed quite simply at runtime. The database API is very simple, providing read-only access to data within a memory-mapped file. You can get pointers to type descriptions based on name alone:
+
+[code]
+const clcpp::Type* a = db.GetType(db.GetName("int"));
+const clcpp::Class* b = db.GetType(db.GetName("TestNamespace::TestClass"));
+const clcpp::Enum* c = db.GetType(db.GetName("TestNamespace::OuterEnum"));
+[/code]
+
+Or you can specify the types directly:
+
+[code]
+const clcpp::Type* a = crcpp_get_type(db, int);
+const clcpp::Class* b = crcpp_get_type(db, TestNamespace::TestClass);
+const clcpp::Enum* c = crcpp_get_type(db, TestNamespace::OuterEnum);
+[/code]
+
+This uses the C++ preprocessor stringising operator to convert the second macro parameter to a const string literal.
+
+Primitives can be located within other primitives using --clcpp::FindPrimitive--. All lists of primitives within other primitives are sorted by name, allowing use of a binary search to quickly find what you want:
+
+[code]
+const clcpp::Type* type = crcpp_get_type(db, Test);
+const clcpp::Name prim_name = db.GetName("some_int");
+const clcpp::Attribute* attr = clcpp::FindPrimitive(type->attributes, prim_name.hash);
+[/code]
+
+You can enumerate all nested primitives if you wish:
+
+[code]
+// Print all constants in the enum
+const clcpp::Enum* e = crcpp_get_type(db, TestNamespace::OuterEnum);
+for (int i = 0; i < e->constants.size(); i++)
+{
+	const clcpp::EnumConstant& c = *e->constants[i];
+	printf("%s : %d\n", c.name.text, c.value);
+}
+[/code]
+
+Efficient use of the database should not use strings at all, however - everything should be based around hashes.
+
+
+==Calling functions by name==
+
+Functions and class methods are primitives like any other that can be called as long as a map file is provided to **clexport** that locates addresses:
+
+[code]
+// Lookup both function descriptions
+const clpp::Function* funca = db.GetFunction(db.GetName("TestNamespace::FreeFunction"));
+const clpp::Function* funcb = db.GetFunction(db.GetName("TestNamespace::TestClass::Method"));
+
+// Call the free function with an integer
+clcpp::CallFunction(funca, 3);
+
+// Call the method with 'this' passed explicitly as the first parameter
+TestNamespace::TestClass c;
+clcpp::CallFunction(funcb, &c, TestNamespace::ONE);
+[/code]
+
+The function call API in the main --clReflectCpp-- project is very simple and not advised for general use. If the assumptions you make about the parameters of the functions you are calling are incorrect, your program is likely to become unstable. I'll be developing a more general function call API similar to the one I developed for {Tahiti|http://donw.org/Tahiti.zip} that can be used for script binding.
+
+
+==A request for help==
+
+clReflect is something I am dedicated to maintaining and improving - it will see rapid development as I am using it to develop my commercial products. There are places I want clReflect to go but don't have the time or money to be able to do that. If you find clReflect useful or are excited at the direction its headed in, please consider lending a hand in the following areas:
+
+* Port the code to run optionally as part of a clang compiler pass, replacing the map file scanning with LLVM function addresses and deriving the member offsets natively. This is by far the most natural way to achieve Reflection with C++.
+* Port to the MacOS and Linux platforms using the existing strategy or the one mentioned in the first bullet point. There is a bunch of code not properly platform-abstracted in the tools (e.g. map file parser) and the clang frontend needs to be initialised based on current platform correctly.
+* Port to the current generation of consoles. Porting to the Xbox 360 should be pretty simple, with special attention needed for the offset calculations.
+* The source distribution is built with my own build system, {PiB|PiB}, because I find it pretty easy to use. This is not good for wide use of clReflect and should ideally be ported to {CMake|http://www.cmake.org/} like clang/LLVM.
+* Modifications are frequent and the current test cases are not good enough to handle that. I don't need unit tests for this but a complete suite of functional tests against previous debug outputs would help immensely.
+* **clexport** could do with some additional export formats, e.g. XML, JSON, or YAML.
+* Check out open issues list and see if there's anything you'd like to contribute!
+
+[disqus][/disqus]

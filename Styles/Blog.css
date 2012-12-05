@@ -1,0 +1,191 @@
+@font-face
+{
+	font-family: oswald;
+	src: url('../Fonts/Oswald.ttf');
+}
+@font-face
+{
+	font-family: equation_font;
+	src: url('../Fonts/cmti10.ttf');
+}
+
+
+/* Body of each post */
+.post
+{
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:12px;
+	font-weight:300;
+	line-height: 1.5em;
+	margin:10px 10px 20px 10px;
+	padding:20px;
+	border-color: #AAA;
+	border-style:solid;
+	border-width:1px;
+	border-radius:4px;
+	box-shadow: 0px 0px 0px #000;
+	background:#F8F8F8;
+	opacity:0;
+
+	transition-duration:0.8s;
+	-moz-transition-duration:0.8s;
+	-webkit-transition-duration:0.8s;
+	-o-transition-duration:0.8s;
+}
+
+.post .viewhtml
+{
+	font-family:Courier;
+}
+
+/* Title of a single post */
+.post .title
+{
+	text-decoration:none;
+	font-family:Oswald, Helvetica, sans-serif;
+	font-size:18px;
+	color:#000;
+}
+
+/* Formatting for title date string */
+.post .date
+{
+	font-size:7pt;
+}
+
+hr
+{
+	border-color: #AAA;
+	border-style:solid;
+	border-top-style:none;
+	border-width:1px;
+}
+
+/* Colour all links */
+a
+{
+	color:#AA2222;
+	text-decoration:none;
+}
+a:hover
+{
+	border-bottom: 1px dotted #ba0000;
+}
+
+/* Mouse hover over post title */
+a.title:hover
+{
+	text-decoration:underline;
+	border-bottom: 0px;
+}
+
+/* Remove margins from HTML header tags */
+h4
+{
+	margin:0 0 0 0;
+}
+h3
+{
+	margin:0 0 0 0;
+}
+h2
+{
+	margin:0 0 0 0;
+}
+h1
+{
+	margin:0 0 0 0;
+}
+
+/* Code block within a post */
+.code
+{
+	font-family:"Courier New";
+	font-size:0.9em;
+	margin:0 20px 0 20px;
+	padding: 0 0 12px 12px;
+	background-color:#DDD;
+	border-style:solid;
+	border-width:1px;
+	border-color:#AAA;
+}
+
+/* Syntax highlighting descriptors for a code block */
+.code .keyword
+{
+	color:#0000FF;
+}
+.code .string
+{
+	color:#DD0000;
+}
+.code .comment
+{
+	color:#008000;
+}
+
+
+/* Equation display with custom TeX font */
+.equation
+{
+	font-family: equation_font;
+	font-size: 13pt;
+}
+.equation_sym
+{
+	font-family:Verdana,sans-serif;
+	font-size:10pt;
+}
+.equation_large
+{
+	font-family: equation_font;
+	font-size: 20pt;
+}
+
+
+/* Graph display */
+.dygraph-label { font-family: Verdana; }
+.dygraph-title { font-family: Verdana; font-size: 14px; }
+
+
+/* A set of nested div ids for displaying an image */
+/* The appearance of nesting is achieved with increasing z-indices with no inheritance */
+#image_background
+{
+	display:none;
+	position:absolute;
+	background-color:#000;
+	opacity:0.5;
+	/*filter:alpha(opacity=0.5);*/
+	top:0px;
+	left:0px;
+	margin:0;
+	padding:0;
+	border:0;
+	z-index:100;
+}
+
+#image_foreground
+{
+	display:none;
+	position:absolute;
+	background-color:#000;
+	top:0px;
+	left:0px;
+	margin:0;
+	padding:0;
+	border:0;
+	z-index:101;
+}
+
+#image_display
+{
+	display:none;
+	position:absolute;
+	top:0px;
+	left:0px;
+	margin:0;
+	padding:0;
+	border:0;
+	z-index:102;
+}

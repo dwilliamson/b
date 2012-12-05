@@ -1,0 +1,13 @@
+[lit]<div style="font-size:8pt; line-height:1.3em;">[/lit]**LatestPosts**
+{Star: Record/Playback and a New Window Manager|2012-11-30-12-30-01}
+{Star: Native Browser Games & Tools with clReflect|2012-11-22-13-08-40}
+{Star: Scale, Physics and Shading|2012-11-15-12-43-24}
+{Announcing: Project Star|2012-11-07-17-10-02}
+{Skeletal Animation Looping with Autocorrelation|2012-08-20-16-07-23}
+{Smoother Assert Response with Visual Studio|2012-08-02-18-01-22}
+{Getting Google to Index AJAX Content|2012-07-27-12-42-30}
+{Quaternions and Dual Quaternion Skinning|2012-07-19-12-52-03}
+{An Implementation of _CIpow|2012-05-15-10-36-23}
+{Risk, Prototypes and Planetary Bodies|2012-04-11-22-56-23}
+{Cross-browser, Native/Remote D3D Rendering with C++|2012-03-08-13-00-00}
+{An RPC Debugging Workflow with Visual Studio|2012-02-07-11-37-23} [lit]</div>[/lit]

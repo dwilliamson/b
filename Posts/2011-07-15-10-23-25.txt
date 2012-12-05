@@ -1,0 +1,58 @@
+<<Variadic macro dispatch in Visual C++ 2005 and later>>
+
+While the world awaits the arrival of variadic macros in C++, most production compilers out there have added [lit]__VA_ARGS__[/lit] support as an extension with implementations that vary quite subtly. Variadic macros are a feature of {C99|http://www.open-std.org/jtc1/sc22/wg14/www/standards} and since C++ is not entirely a superset of C these days ({variable length arrays|http://drdobbs.com/184401444} would be nice), nobody is under any obligation to support them.
+
+Variadic macros are pretty cool - you can do stuff like this (prints log data such that you can double-click on the output in Visual Studio and it jumps to source code where it's emitted):
+
+[code]
+#define LOG(fmt, ...) printf("%s(%d) : " fmt, __FILE__, __LINE__, __VA_ARGS__)
+LOG("there are %d arguments to this %sn", 3, "macro");
+[/code]
+
+That's generally the limit to the support provided by most compilers. Unfortunately that means there's no support for counting the number of arguments passed to the macro or even accessing each argument individually. There's a little trick for achieving this, however:
+
+[code]
+#define VA_NARGS_IMPL(_1, _2, _3, NARGS, ...) NARGS
+#define VA_NARGS(...) VA_NARGS_IMPL(__VA_ARGS__, 3, 2, 1, 0)
+printf("%dn", VA_NARGS(1, 2, 3));
+[/code]
+
+This works by starting the call off to VA_NARGS_IMPL with any parameters that get passed to VA_NARGS, adding the 3,2,1,0 values at the end. One of these numbers gets assigned as the NARGS parameter depending on how many arguments you pass, and that gets returned. The caveat is that this trick only works on  few compilers out there. VC2005 passes [lit]__VA_ARGS__[/lit] to VA_NARGS_IMPL as one preprocessor token and will always return the result of 1. Currently from versions 2005 to 2010, {there are no plans to fix this|http://connect.microsoft.com/VisualStudio/feedback/details/380090/variadic-macro-replacement}.
+
+In VC2005 and later versions you can do this to get it working:
+
+[code]
+#define EXPAND(x) x
+#define VA_NARGS_IMPL(_1, _2, _3, NARGS, ...) NARGS
+#define VA_NARGS(...) EXPAND(VA_NARGS_IMPL(__VA_ARGS__, 3, 2, 1, 0))
+[/code]
+
+This adds an extra level of function-like macro expansion for the PP to perform before it evaluates the object-like macro [lit]__VA_ARGS__[/lit]. I'm not entirely sure why VC behaves like this - stepping through Clang as it evalutes the original form confirms that the straightforward implementation of a PP (iterative function-like, object-like replacement on a line) gives the correct result. It's not a variation of the symbol join/evaluate problem and at a guess I'd say VC doesn't perform object-like macro expansion on its first pass when it encounters a variadic macro. It's some kind of PP hack that sits outside the normal expansion code, introducing a define for [lit]__VA_ARGS__[/lit] and then kicking off the iterative expansion as normal (hence the need for the extra level of indirection).
+
+Moving on, we have the following macros:
+
+[code]
+#define PRINT1(x) printf("%dn", x)
+#define PRINT2(x, y) printf("%d %dn", x, y)
+#define PRINT3(x, y, z) printf("%d %d %dn", x, y, z)
+[/code]
+
+and we want to be able to do this:
+
+[code]
+PRINT(1);
+PRINT(1, 2);
+PRINT(1, 2, 3);
+[/code]
+
+We can introduce the {classic symbol join macro|http://msdn.microsoft.com/en-us/library/b0084kay(v=vs.80).aspx} that adds an extra level of indirection to force object-like macro expansion to achieve this:
+
+[code]
+#define JOIN2(x, y) x ## y
+#define JOIN(x, y) JOIN2(x, y)
+#define PRINT(...) JOIN(PRINT, VA_NARGS(__VA_ARGS__))(__VA_ARGS__)
+[/code]
+
+That's it!
+
+[disqus][/disqus]

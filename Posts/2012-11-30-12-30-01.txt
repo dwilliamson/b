@@ -1,0 +1,74 @@
+<<Star: Record/Playback and a New Window Manager>>
+
+Before we head into December, I figured I'd show you some screenshots from the progress I made prior to the scope of this all going a bit crazy :)
+
+Here's a quick shot of the Editing Room at that point:
+
+||{{http://farm9.staticflickr.com/8485/8232472486_b2e6eca168_z.jpg|url:http://www.flickr.com/photos/donw/8232472486}}||
+
+There are several pretty interesting new features at work here, some of which can't fully be seen unless you see the screenshots of their development. You can view them all by checking out the Flickr history page for this project:
+
+||{{Images/StarHistorySet.gif|url:http://www.flickr.com/photos/donw/sets/72157632133873231}}||
+
+These lovely new features are:
+
+* Recording, playback and post-record modifications On Set are all working.
+* You can manage and preview individual clips within scenes in the new Video Player; live-selecting which camera to view the clip from.
+* Scenes can be dragged onto the timeline and edited. Each clip as a list of properties you can edit (currently just which camera to view from).
+* The movie timeline has been fully implemented with scrubbing, zoom, pan, cutting, etc.
+* I added a new window manager with UI widgets like drop-down combo boxes.
+
+
+== Record/Playback ==
+
+This is the backbone of the application and is responsible for me having to do a crazy amount of work for every feature I decide to implement. Every time I describe this interaction loop to people, I feel like there's way too much to describe and they get lost. However, whenever I demo it, there's always this: "Oh. Wow! That's pretty cool." So until I gain the confidence to show some videos, this description will have to do :)
+
+* You drag/drop an actor into the world and double-click to take control of it.
+* You hit record, do your thing and a clip is created for that sequence.
+* You drag/drop more actors into the world, take control of them and hit record. Previous actors do their thing while you interact with them.
+* Redo previous acts, add more or move to a new location to create entirely new clips.
+* Switch to the Editing Room to see a list of all your clips.
+* Select clips individually to preview with play, fast-forward, rewind, etc.
+* Drag clips onto the timeline and adjust their time and length of play.
+* Scrub through the movie to any point in time or just hit play to see what your movie looks like.
+
+When you initially record an act, only the input to the game logic is recorded. This is the input that gets compressed on disk or sent to your friends for modifications/additions, so it's pretty light-weight. Unfortunately, this format doesn't allow you to easily move through the timeline in the Editing Room so upon switching, all out-of-date clips will have a "position cache" generated for them on an idle thread/core.
+
+Determinism is key here and I'm still wondering whether it is actually a desired goal. I'm thinking of forgoing it entirely at a later point and using some form of AI to keep things as sync'ed as possible. But that's all for next year when I get a bunch of people playing around with the alternatives.
+
+However, it's pretty fun to play around with all this. Which is good :)
+
+== The Timeline ==
+
+I love this little widget - it's a custom control implemented with the new HTML5 canvas object:
+
+||{{Images/StarTimeline.gif|Images/StarTimeline.gif}}||
+
+Some of the cool features are:
+
+* Scrolling/panning is super-smooth.
+* Zooming smoothly fades in/out the required time ticks and their labels.
+* The cursor is custom-implemented to so that I can control the hot-spots of the icons it changes to when you modify elements.
+* Time is divided into 1/8ths of a second to allow precise positioning of elements.
+
+It took me a while to iterate on the Javascript code for this as the data it controls is replicated over the network to the C++ game logic. Even now, several months later, I have significant work to do on it and I anticipate that it will be constantly changing to adapt to new features.
+
+== The Clip List ==
+
+This control isn't yet housed in the window manager but it's still pretty cool:
+
+||{{Images/StarSceneClipList.gif|Images/StarSceneClipList.gif}}||
+
+It lists all the scenes in your current movie along with a thumbnail generated from one of your cameras. As you might have guessed, that bit wasn't yet implemented :) However, you can select each clip and preview them. The UI is nice with smooth fading and expansion/contraction of the lists.
+
+I had a lot of fun with the CSS of this but I will ultimately go back to it and change again to update to CSS 3. A lot of the animation code can be deleted, requiring less maintainence from me!
+
+== The Window Manager ==
+
+Finally, the Window Manager was my own custom implementation (everything out there is wildly over-engineered or just not stable enough yet). Windows can be dragged around, overlap each other, switch to front/back, smoothly close/pop-open and contain layout code for child controls. A good example is the rather minimal clip properties dialogue box that pops up whenever you select a clip on the timeline:
+
+||{{Images/StarClipProperties.gif|Images/StarClipProperties.gif}}||
+
+This houses a property grid, which itself houses a combo-box for selecting the camera to view the clip from. The design for the Window Manager is very "programmer-y". I may hire somebody to make it more pleasing near the end, or I may just keep learning about UI concepts and try to make it better myself - we'll see :)
+
+[disqus][/disqus]

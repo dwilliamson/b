@@ -1,0 +1,124 @@
+<<The UK: Credit is King and the self-employed live outside the castle walls>>
+
+I figured I'd cover a bit about what's been going on behind the scenes lately while I try to build my game. It's a bit personal but I suppose it can be considered a "human interest" story and may be useful to others who are looking for alternatives to so-called AAA game development. It also highlights some of my naivety and how doing this really is an amazing learning experience for me.
+
+My situation is, briefly:
+
+* I have been gainfully employed for 13 years in the games industry, in the UK, Canada and France.
+* Throughout that time period I've saved money fervently and built up enough savings to self-fund myself for a few years.
+* I quit my job at Microsoft to build my own game.
+* I am registered self-employed with HMRC, still pay NI tax and will be doing self-assessment.
+* I will build a business before the tax year ends if the game shows promise and I need other people on-board.
+
+I live with my girlfriend in a very nice 3 bedroom house in Hove/Brighton. The neighbourhood is lovely and quiet but there are a couple of issues:
+
+* It's expensive. When I'm not receiving a monthly income, it's not justifiable.
+* Our contract is up on January 1st.
+
+What follows is part of our story over the last few months, trying to address this... we needed a plan!
+
+
+== Buying a house will save me money ==
+
+If I could get a mortgage with my girlfriend then our monthly property outgoings would be halved. More importantly: a significant chunk of that money would be going into our future.
+
+I didn't hold out much hope of getting a mortgage myself as, when self-employed, you need 3 years of accounts from your business. Some lenders are willing to make that 2 years if your business is within your existing trade. However, I could put down a sizeable deposit and in the process **double** the amount of time I could stay self-employed, building the game.
+
+Given that I'm pretty much an employable entity even if the game/business doesn't work out, this all sounded too good to be true.
+
+The plan was thus:
+
+* Start looking 4 months before we're due to move out.
+* Put an offer in on a house as early as possible using the fact that we're not part of a chain as an advantage.
+* If everything goes pear-shaped, we can move into my girlfriend's much smaller flat temporarily.
+* I would supply the deposit, my girlfriend the mortgage, we would both be on the deeds and we'd sign some monetary agreement contracts.
+
+We didn't fancy the idea of moving into my girlfriend's flat long term for lots of reasons. Although, we weren't ruling it out as a last resort.
+
+
+== Howard Brown wants my money. No... ALL of it! ==
+
+We first met success with Halifax as my girlfriend already had a mortgage with them and we had a joint account there. My suspicions were comfirmed; when it comes to me and mortgages, "computer says no." However, my girlfriend was told she could have a 90% mortgage, provided she could raise the deposit, so we went house hunting.
+
+Quickly, we found a great house within our price range, in the perfect location and put an offer in. After some negotiation it was accepted, on the understanding that we get a {Mortgage in Principle|http://www.direct.gov.uk/en/MoneyTaxAndBenefits/ManagingMoney/Mortgages/DG_10013667} from Halifax. After arriving at the branch, the nice lady typed our details back in and looked somewhat puzzled. "Sorry, it looks like we can only offer you an 85% mortgage."
+
+Cue look of disbelief.
+
+After some calculations and concessions we figured that we could just about stretch to that amount. By the time we got back to the estate agents, however, the property was gone; given to a cash buyer for the asking price. Apparently.
+
+So we went out looking again; this time for a cheaper property. Luckily, we found a place that accepted a significantly lower figure than the asking price. It needed about a month's worth of work before being livable (e.g. it had no kitchen) but we had just enough time and could move into my girlfriend's place if it took any longer. We also calculated that we could make a good bit of money if we sold the property at a later date.
+
+My girlfriend's solicitor was let off the leash and our the mortgage application went off to the underwriters (there's no coincidence their name reminds me of undertakers, as you will soon discover).
+
+After a few days of delays and no feedback we got some information. (Note the use of the term "got," here. These people never contact you - they wait for you to contact them and then they give you the bad news.) Apparently, due to the fact that my girlfriend already had a mortgage with Halifax, they could now only offer us a 75% mortgage.
+
+75%. Thousands of pounds. They had that information. In the branch. The day we first walked in.
+
+We told them where they could stick their "mortgage offer" and went to some other lenders.
+
+
+== The helpful IFA who may have driven a yellow Reliant Regal ==
+
+Speaking with my banks, we were immediately told that we couldn't afford a second mortgage on a single income, which was actually quite nice. Quick, if somewhat negative, news delivered with no craziness.
+
+It looked like we were going to have to pull out before a friend put us in contact with an IFA that thought our application was "one of the simplest he'd ever seen; an application that would be completed in a few days." Wohey!
+
+After a few days, he found us an offer with Santander at 85% and we quickly contacted the vendor to reassure them that everything was going OK. Even better, he said I could go on the mortgage, too! It took a couple of weeks to push through after news came back that I had a lack of positive credit in the UK, despite growing up here (working overseas tends to do that for you). Due to a misunderstanding with postal addresses, the only contribution I had was a negative £10 gas bill that was eventually settled once the company I owed money to eventually figured out where I lived.
+
+Note that at this point I'd been paying a significant amount of money each month to various landlords, inland revenue, energy companies and that single mark was enough to make Santander cagey. We resorted to the original plan and continued. A couple more weeks later with "everything was going fine" and "it should be done in a couple of days" being the standard response from our IFA, we started getting worried and annoyed. Eventually he came back to us saying that everything had been approved and that all that was required was the valuation to be instructed.
+
+We'd already payed the solicitors for a survey and various other bits and pieces and so now had to pay for the valuation. This was good. Things were getting further than before.
+
+Another couple of weeks later and Santander hadn't got round to instructing the valuation so we complained to our IFA while the vendor was getting restless. He complained to Santander. We got word back a few days later that there was a backlog of mortgage applications near christmas and Santander were still pushing it through. After another week we got more vocal and found out that they had apparently made an error with our application, ammended it and put it right to the back of the queue. After some angry complaining they pushed it back up to try and instruct the valuation.
+
+And then they hit us. Hard. "We won't instruct the valuation unless you give us another £10,000 deposit". Jebus on a bike. This was stressful and wasn't making any sense. We managed to very thankfully secure the money with our family and Santander accepted the mortgage. Again. I think. "The valuation will be instructed in 3 days," we were told, along with a reduction in the interest by 1% to keep us sweet.
+
+If there were any more delays beyond this point, we'd be moving into my girlfriend's flat.
+
+
+== Have you ever seen it rain indoors? ==
+
+We were having a coffee and going through all of the numbers when my girlfriend got a worrying phone call about a small water leak that was coming through the ceiling of the tenant who was living below her flat. I left for work while she went to check out the flat. Half an hour later I received a distressed phone call about a mammoth water leak, so I quickly cycled over to see what the trouble was.
+
+Walking into the flat, I could quite clearly see, feel and hear rain. Only this wasn't water. This was faeces and waste from a soil pipe that had burst in the ceiling of the bedroom. The soil pipe supplied two flats with 5 tenants and was horizontally fitted so that whenever waste entered the pipe, it never really went anywhere.
+
+The flat, its carpet, floorboards, roof and walls were ruined. After a highly stressful couple of days, the good news was that everything was covered by the insurance (yet again; the flat has a bad history of stuff like this happening and the insurance company not paying enough to get it properly diagnosed and fixed). The bad news was that the place was an active health hazard and could not be lived in for the next 2 to 3 months while it was decontaminated and repaired.
+
+On top of that, there were more mortgage delays and we were looking at the prospect of living in a cold, dirty house with no kitchen and an interminable smell of tobacco that was growing on the walls.
+
+
+== The solictor sounds the death knell ==
+
+Everything was looking like it was going to complete and we initiated contact with our solicitor again. We were told: because I was not on the mortgage I could not be on the title deeds. Not only that, they said I had to sign my deposit over to my girlfriend as a "gift," waiver all rights to or interest in the property and seek separate legal advice. They tell us this when from day one we were paying them and they were aware of that information. If ever there was a time for a slow, painful elaboration of the words "What. The. Fuck.", it was now.
+
+We had no option but to end everything and quickly, frantically search for a new place to rent. Our first port of call was to ask our landlord for a month's extension but his response was a negative: he didn't want the fuss of extra legal paperwork and was getting a new carpet fitted which he didn't want our cat to walk on. Yeah...
+
+
+== Moving into a smaller rented place will save me money ==
+
+We went on the hunt - it's quite an odd feeling, packing to move house knowing that you don't yet have anywhere to go. Being christmas time, there wasn't much on the market but we found an amazing place for an asking price that was less than our current place. It was on with 4 estate agents and the guy told us that the owner would accept much less than the asking price and so we offered. He gave us a counter-offer but by the time we could get word back, he'd found somebody to rent at the full price with another estate agent. We really should have just paid the asking price.
+
+Having no luxury to be picky and with a little bit of panic, we kept looking. We soon found another place and promptly offered to rent. Our case was put to a referencing company, where the troubles began.
+
+At first they said my girlfriend couldn't afford her share of the rent because her income couldn't demonstrate it. We talked things over, sent a few faxes and I guess they realised they got their figures wrong because they amended that position and then turned on me. As I was self-employed I needed a reference from an accountant, similar to applying for a mortgage. Of course, as I'd only just started building my product, had no need for an accountant and couldn't demonstrate any form of business income, I was deemed somebody who couldn't afford the rent.
+
+Let's back-track here. I had been out of work for 6 months, studiously paying the rent on a much more expensive house. I had enough money in the bank to rent the place for the next 10 years. And I was told I couldn't afford to rent it and thus had no right to. Apparently that money could be "there one minute and gone the next." Unlike a job (in the games industry, no less). Of course!
+
+The running theme that every estate agent, banker and IFA kept telling me was that if I went out and got a job for two months (it could be anything!), there wouldn't be a problem.
+
+So I needed a guarantor for the rent, who I was told had to be a house owner. I asked a very close family member who was more than happy to help. And they declined them as they were retired. Forget the fact that they were quite wealthy and owned multiple properties. Oh, no, that's not remotely good enough!
+
+
+== Closure ==
+
+So this is where we are. Almost done packing and still unsure if we'll get the keys to the new place. We've arranged somebody else as the guarantor and the estate agent thinks there'll be no further problems. I think many would forgive us for being slightly anxious about that.
+
+It's almost enough to make you think you've made a mistake and should go back to a well paid job, chasing the ideals of Familialism, Social Order and loyal Consumerist Debt. Only it's not. This is exactly the kind of thing that gets me more charged and determined to do things my way. If something's easy, it's not worth having. If something is different, troubled with challenges and not exactly clear-cut, it needs to be tamed and made your own.
+
+Meanwhile, there are thousands, if not millions of people in worse off situations than this and I consider myself extremely lucky to be in the situation I am in today.
+
+--If you have the ability, please consider a donation to {Shelter|http://www.shelter.org.uk} to help families and individuals in the UK that are at risk of becoming homeless.--
+
+Let's hope we get what we need this time!
+
+[disqus][/disqus]

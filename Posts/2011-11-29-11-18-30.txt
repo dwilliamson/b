@@ -1,0 +1,24 @@
+<<clReflect 0.3 released>>
+
+After a couple months hard work, the latest version of clReflect has been uploaded; you can download it {here|https://bitbucket.org/dwilliamson/clreflect/downloads/clReflect-0.3.7z} or browse the latest source code {here|https://bitbucket.org/dwilliamson/clreflect/overview}. It's in continuous use on my new game project and I'm picking away at bugs and features as I need them. As always, if there's something that you don't like or a feature I haven't got round to adding yet, please send patches!
+
+There are some very cool new features in 0.3, including:
+
+	* Container support with iterator interfaces and a means of registering/parsing the containers in C++.
+	* Support for constant-size arrays as field types (classes, functions, methods).
+	* Constant-time, string-less GetType and GetTypeNameHash functions so that a runtime should never need to depend on string processing and the functions can be used in templated functions.
+	* A new utility library (clReflectUtil) that contains optional C++ runtime components that can be used with clReflect.
+	* Versioned, binary serialisation for reflected types.
+	* A very complete JSON serialiser for reflected types with no external library dependencies.
+	* A basic object model implementation with base objects and object database with iterators.
+	* DLL support with function pointer rebasing and an interface/implementation abstraction for plugin development.
+
+There are many C++ language support improvements (e.g. anonymous structs/unions, [lit]__int64[/lit], typedefs, templated base classes) and bug fixes that are detailed in the {release notes|https://bitbucket.org/dwilliamson/clreflect/src/9db41e8a22ff/release/README}. This is also the first version to use the latest LLVM/clang 3.0 release branch for a stable base.
+
+In other news, I've started a {Reflection in C++|http://altdevblogaday.com/2011/09/25/reflection-in-c-part-1-introduction/} tutorial series over at {#AltDevBlogADay|http://altdevblogaday.com/} that may interest users of clReflect. Part 2 is complete, awaiting publishing clearance from Ubisoft and going through proof-reading.
+
+{PiB|https://bitbucket.org/dwilliamson/pib} continues to evolve and receive performance improvements. The API has settled down but there are many internals that I'd like to improve/rewrite. However, that's not likely to happen soon as it's more than satisfactory for my needs and I have my startup to concentrate on.
+
+Likewise, {TinyBlog|https://bitbucket.org/dwilliamson/tiny-blog} has improved, receiving {Disqus|http://disqus.com/} commenting support more recently. I haven't updated the Bitbucket copy of the source yet but if you view the source of this website, it's all there.
+
+[disqus][/disqus]
