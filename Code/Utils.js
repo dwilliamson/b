@@ -115,6 +115,27 @@ function Selector(name_or_node)
 			this.Node = document.getElementById(name_or_node.substr(1));
 	}
 
+	this.empty = function()
+	{
+		while (this.Node.firstChild)
+			this.Node.removeChild(this.Node.firstChild);
+		return this;
+	}
+
+	this.append = function(html)
+	{
+		var div = document.createElement("div");
+		div.innerHTML = html;
+		this.Node.appendChild(div);
+		return this;
+	}
+
+	this.set_html = function(html)
+	{
+		this.Node.innerHTML = html;
+		return this;
+	}
+
 	this.show = function()
 	{
 		this.Node.style.display = "inline";
@@ -124,6 +145,19 @@ function Selector(name_or_node)
 	this.hide = function()
 	{
 		this.Node.style.display = "none";
+		return this;
+	}
+
+	this.offset = function()
+	{
+        var x = 0, y = 0;
+        for (var node = this.Node; node != null; node = node.offsetParent)
+        {
+                x += node.offsetLeft;
+                y += node.offsetTop;
+        }
+
+        return { top: y, left: x };
 	}
 
 	this.set_left = function(left)
@@ -147,6 +181,12 @@ function Selector(name_or_node)
 	this.set_height = function(height)
 	{
 		this.Node.style.height = height + "px";
+		return this;
+	}
+
+	this.set_opacity = function(opacity)
+	{
+		this.Node.style.opacity = opacity;
 		return this;
 	}
 

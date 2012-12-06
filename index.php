@@ -10,6 +10,10 @@
 	
 	<body id="background">
 	
+		<div id="menu"></div>
+		<div id="content"></div>
+		<div id="info"></div>
+
 		<script language="javascript" src="Code/Extern/zepto.min.jgz"></script>
 		<script language="javascript" src="Code/Extern/dygraph-combined.jgz"></script>
 		<script language="javascript" src="Code/Min/TinyBlog.jgz"></script>
@@ -45,7 +49,7 @@
 
 			function post_callback(div)
 			{
-				div.css("opacity", "1");
+				div.set_opacity(1);
 			}
 
 
@@ -60,7 +64,7 @@
 				disqus_identifier = params["d"];
 
 				// Display latest posts only from the front page
-				$("#content").empty();
+				S("#content").empty();
 				blog_engine.DisplayPosts("#content", blog_posts, params, post_callback, false);
 			}
 
@@ -93,10 +97,6 @@
 			});
 
 		</script>
-
-		<div id="menu"></div>
-		<div id="content"></div>
-		<div id="info"></div>
 
 		<script type="text/javascript">
 

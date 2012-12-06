@@ -18,9 +18,6 @@ function BlogEngine()
 		// Force a load of the image by the browser and specify a delegate that responds to the load
 		img = new Image();
 		img.src = element.href;
-		img.src_offset = $(element).offset();
-		img.src_width = $(element).width();
-		img.src_height = $(element).height();
 		img.onload = function()
 		{
 			// Set the image in the display element
@@ -80,7 +77,7 @@ function BlogEngine()
 		// Check to see if the post div is visible before requesting the post contents
 		var window_h = window.innerHeight;
 		var window_t = window.pageYOffset;
-		var div_offset = $(post_div).offset();
+		var div_offset = post_div.offset();
 		if (load_all == false && div_offset.top > window_t + window_h)
 		{
 			// Reschedule the load request for this post on each scroll of the window
@@ -106,7 +103,7 @@ function BlogEngine()
 			// Create a new parser for the post, parse it and add the generated HTML to the document
 			parser = new Parser(data, date, document_url, document_id, params);
 			parser.parse();
-			post_div.html(parser.html);
+			post_div.set_html(parser.html);
 
 			// Notify the caller that the post has displayed
 			if (post_callback)
@@ -140,10 +137,10 @@ function BlogEngine()
 				if (typeof blog_posts[i] != "string")
 				{
 					var html = blog_posts[i].parse();
-					$(div_id).append('<div class="post" id="generated">' + html + '</div>');
+					S(div_id).append('<div class="post" id="generated">' + html + '</div>');
 
 					if (post_callback)
-						post_callback($("#generated"));
+						post_callback(S("#generated"));
 
 					continue;
 				}
@@ -165,8 +162,8 @@ function BlogEngine()
 
 				// Add the div for the post first because the AJAX requests for the content will come in out of order
 				var post_div_id = "Post" + document_id.replace(/\-/g, "");
-				$(div_id).append('<div class="post" id="' + post_div_id + '"></div>');
-				var post_div = $("#" + post_div_id);
+				S(div_id).append('<div class="post" id="' + post_div_id + '"></div>');
+				var post_div = S("#" + post_div_id);
 
 				// Queue for display
 				display_post_calls.push(bind("DisplayPost", params, blog_posts[i], document_id, post_div, load_all));
