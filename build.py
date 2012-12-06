@@ -67,7 +67,7 @@ def CompressJavascriptFile(src_filename):
 
 	# Compress
 	with open(src_filename, "rb") as inf:
-		with gzip.open(dest_filename, "wb") as outf:
+		with gzip.GzipFile(dest_filename, "wb", 9, mtime = 0) as outf:
 			outf.writelines(inf)
 
 
