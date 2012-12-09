@@ -21,7 +21,7 @@ function BlogEngine()
 		img.onload = function()
 		{
 			// Set the image in the display element
-			$("#image_display").attr("src", this.src);
+			S("#image_display").set_attr("src", this.src);
 
 			// Calculate image destination width and height at 60% of the window size
 			var img_dest_w = window_w * 0.6;
@@ -64,12 +64,12 @@ function BlogEngine()
 		S("#image_display").hide();
 	}
 
-	$(document).ready(function()
+	DomReady.ready(function()
 	{
 		// Create the HTML elements required to display images
-		$("body").append('<div id="image_background"></div>')
-		$("body").append('<div id="image_foreground"></div>');
-		$("body").append('<img id="image_display">');
+		S("body").append('<div id="image_background"></div>')
+		S("body").append('<div id="image_foreground"></div>');
+		S("body").append('<img id="image_display">');
 	});
 
 	DisplayPost = function(params, filename, document_id, post_div, load_all, chain, chain_index)
@@ -89,7 +89,7 @@ function BlogEngine()
 			return;
 		}
 
-		$.get(filename, function(data)
+		S.get(filename, function(data)
 		{
 			// Construct the date from the document ID
 			var date = null;
@@ -110,10 +110,14 @@ function BlogEngine()
 				post_callback(post_div)
 
 			// Add an onclick event to each generated image link to show it
-			$("a.image").click(function(event){
-				show_image(event.currentTarget);
-				event.preventDefault();
-			});
+			var images = post_div.Node.getElementsByClassName("image");
+			for (i in images)
+			{
+				S(images[i]).click(function(event){
+					show_image(event.currentTarget);
+					event.preventDefault();
+				});
+			}
 
 			// Schedule any remaining posts
 			if (chain_index < chain.length)
@@ -128,7 +132,7 @@ function BlogEngine()
 	this.DisplayPosts = function(div_id, blog_posts, params, post_callback, load_all)
 	{
 		// This launches whenever the document is ready to write to
-		$(document).ready(function()
+		DomReady.ready(function()
 		{
 			var display_post_calls = [ ];
 

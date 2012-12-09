@@ -6,6 +6,7 @@ js_min_file = "Code/Min/TinyBlog.js"
 
 js_files = [
 	"Code/Utils.js",
+	"Code/DOMReady.js",
 	"Code/ParserState_Code.js",
 	"Code/ParserState_Disqus.js",
 	"Code/ParserState_Equation.js",
@@ -16,7 +17,6 @@ js_files = [
 
 js_extern_files = [
 	"Code/Extern/dygraph-combined.js",
-	"Code/Extern/zepto.min.js",
 ]
 
 

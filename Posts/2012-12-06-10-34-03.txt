@@ -1,0 +1,37 @@
+<<Star: Distance Fields to Voxels to Polygons>>
+
+At this point things were looking pretty good: I setup a few car chases and did some bullet-proofing of clip composition for movies. The next stage was to figure out how the world would look and stream/generate as you moved around it.
+
+As mentioned in an earlier post, I was going for a heightfield-based island, but something about that approach nagged me. It's very easy to make a heightfield renderer; so much so that everybody's done one and it's very hard to make them look unique. I also understood that you can spend years on making a heightfield renderer optimal for your target platform and modification pipeline, and that going for anything more complicated was bound to squeeze my schedule in some way.
+
+One of my most memorable games is {Drakan|http://www.youtube.com/watch?v=D9zrG5DD9hw}, a game that managed to capture caves, overhangs and other natural landscapes through instancing of heightfields (caves would just be inverted heightfields). It was pretty effective and something that we ended up trying on Fable 3. 
+
+However, I needed something that would stand out even more, and went ahead with a decision that would cause me lots of sleepless nights.
+
+== Procedural Distance Fields ==
+
+It was this {GPU Gems 3 article|http://http.developer.nvidia.com/GPUGems3/gpugems3_ch01.html} that convinced me to go for isosurfaces, so I coded this up:
+
+||{{http://farm9.staticflickr.com/8345/8251294208_8c308b0f13.jpg|http://farm9.staticflickr.com/8345/8251294208_8c308b0f13_b.jpg}}||
+
+Using a 3D noise function, a signed distance field is generated that is sampled to voxels. The voxels are then converted to polygons using the classic Marching Cubes algorithm. I could throw any crazy function I wanted to at this and it would work seamlessly - I was sold!
+
+Of course, I also wanted massive draw distances so level of detail would become a hugely important focus over the coming weeks. To aid that, I split the world up with an octree that would adaptively subdivide around the camera:
+
+||{{http://farm9.staticflickr.com/8063/8250225693_8a313b3c8b.jpg|http://farm9.staticflickr.com/8063/8250225693_8a313b3c8b_b.jpg}}||
+
+Nodes in the octree would render polygons from equally sized voxel fields (32x32x32) for level of detail. Neighbouring nodes were constrained to being 1 level of detail above or below to help solve gaps and seams between levels of detail - a problem I'd yet to address. The subdivision was scheduled on a concurrent thread using a variation of the ROAM split/merge queue:
+
+||{{http://farm9.staticflickr.com/8489/8250277031_f3f1f5a9a8.jpg|http://farm9.staticflickr.com/8489/8250277031_f3f1f5a9a8_b.jpg}}||
+
+Some of the gaps in the landscape should be evident and I had an idea of how I was going to fix them, which I'll cover in a future post. The normals were generated from the vertices so weren't smooth and there was no vertex sharing. It was all pretty inefficient but was a good first pass.
+
+What's evident from the above shot is that I also pulled the log window out. This was moved to a separate dev window that was constantly open on a second monitor:
+
+||{{http://farm9.staticflickr.com/8489/8251330784_79c991f826.jpg|http://farm9.staticflickr.com/8489/8251330784_79c991f826_b.jpg}}||
+
+I'd spent a bit of time adding some debugging features - the new window on the left was a property editor that could remotely observe and display the values of any reflected object live on the server. You can find the full two-monitor view on Flickr {here|http://www.flickr.com/photos/donw/8250225991}.
+
+In the next post I'll cover yet another crazy little change in direction that took a while to pay off!
+
+[disqus][/disqus]

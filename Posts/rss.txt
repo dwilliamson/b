@@ -20,5 +20,6 @@
 2012-08-20-16-07-23|Skeleton Animation Looping with Autocorrelation
 2012-11-07-17-10-02|Announcing: Project Star
 2012-11-15-12-43-24|Star: Scale, Physics and Shading
-2012-11-22-13-08-40|Star: Native Browser Games & Tools with clReflect
+2012-11-22-13-08-40|Star: Native Browser Games and Tools with clReflect
 2012-11-30-12-30-01|Star: Record/Playback and a New Window Manager
+2012-12-06-10-34-03|Star: Distance Fields to Voxels to Polygons

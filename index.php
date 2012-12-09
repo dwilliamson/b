@@ -14,7 +14,6 @@
 		<div id="content"></div>
 		<div id="info"></div>
 
-		<script language="javascript" src="Code/Extern/zepto.min.jgz"></script>
 		<script language="javascript" src="Code/Extern/dygraph-combined.jgz"></script>
 		<script language="javascript" src="Code/Min/TinyBlog.jgz"></script>
 
@@ -89,12 +88,12 @@
 				}
 			}
 
-			$(window).bind("popstate", function (e)
+			window.onpopstate = function (e)
 			{
 				// The browser changes the title automatically, so reevaluate parameters and diplay posts
 				if (allow_pop_state)
 					display_posts();
-			});
+			}
 
 		</script>
 

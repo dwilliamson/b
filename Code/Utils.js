@@ -113,6 +113,8 @@ function Selector(name_or_node)
 	{
 		if (name_or_node[0] == "#")
 			this.Node = document.getElementById(name_or_node.substr(1));
+		else
+			this.Node = document.getElementsByTagName(name_or_node)[0];
 	}
 
 	this.empty = function()
@@ -134,6 +136,11 @@ function Selector(name_or_node)
 	{
 		this.Node.innerHTML = html;
 		return this;
+	}
+
+	this.set_attr = function(attr, value)
+	{
+		this.Node.setAttribute(attr, value);
 	}
 
 	this.show = function()
@@ -201,4 +208,29 @@ function Selector(name_or_node)
 function S(name)
 {
 	return new Selector(name);
+}
+
+
+S.__proto__.get = function(filename, callback)
+{
+	// Create a new object for each request
+	var req;
+	if (window.XMLHttpRequest)
+		req = new XMLHttpRequest();
+	else
+		req = new ActiveXObject("Microsoft.XMLHTTP");
+
+	if (req)
+	{
+		// Setup the callback
+		req.onreadystatechange = function()
+		{
+			if (req.readyState == 4 && req.status == 200)
+				callback(req.responseText);
+		}
+
+		// Kick-off an async request
+		req.open("GET", filename, true);
+		req.send();
+	}
 }
