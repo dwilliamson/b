@@ -211,7 +211,7 @@ function S(name)
 }
 
 
-S.__proto__.get = function(filename, callback)
+get_ajax_document = function(filename, callback)
 {
 	// Create a new object for each request
 	var req;

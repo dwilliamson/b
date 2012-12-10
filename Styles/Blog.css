@@ -72,6 +72,11 @@ a:hover
 	border-bottom: 1px dotted #ba0000;
 }
 
+/* Remove borders around IE image links */
+a { outline: none; }
+a img { outline: none; }
+img { border: 0; }
+
 /* Mouse hover over post title */
 a.title:hover
 {

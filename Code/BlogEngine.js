@@ -89,7 +89,7 @@ function BlogEngine()
 			return;
 		}
 
-		S.get(filename, function(data)
+		get_ajax_document(filename, function(data)
 		{
 			// Construct the date from the document ID
 			var date = null;
@@ -126,7 +126,7 @@ function BlogEngine()
 				c(chain, chain_index + 1);
 			}
 
-		},"html");
+		});
 	}	
 
 	this.DisplayPosts = function(div_id, blog_posts, params, post_callback, load_all)
