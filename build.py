@@ -1,5 +1,8 @@
 
 import gzip
+import os
+import string
+from datetime import timedelta, datetime, tzinfo
 
 
 js_min_file = "Code/Min/TinyBlog.js"
@@ -18,6 +21,12 @@ js_files = [
 js_extern_files = [
 	"Code/Extern/dygraph-combined.js",
 ]
+
+rss_title = "Gazoo.cpp"
+rss_description = "An independent developer in the wild"
+rss_url = "http://donw.org/b/"
+rss_posts = "Posts"
+rss_output = "rss.xml"
 
 
 def BuildTinyBlogMin():
@@ -71,10 +80,91 @@ def CompressJavascriptFile(src_filename):
 			outf.writelines(inf)
 
 
+class GMT0(tzinfo):
+	def __init__(self, year):         # DST starts last Sunday in March
+		d = datetime(year, 4, 1)   # ends last Sunday in October
+		self.dston = d - timedelta(days=d.weekday() + 1)
+		d = datetime(year, 11, 1)
+		self.dstoff = d - timedelta(days=d.weekday() + 1)
+	def utcoffset(self, dt):
+		return timedelta(hours=0) + self.dst(dt)
+	def dst(self, dt):
+		if self.dston <= dt.replace(tzinfo=None) < self.dstoff:
+			return timedelta(hours=1)
+		else:
+			return timedelta(0)
+	def tzname(self,dt):
+		return "GMT +1"
+
+
+def BuildRSS(title, description, url, posts_directory, output):
+
+	print("\nGenerating RSS file " + output)
+	outf = open(output, "w")
+
+	# Generate the header
+	print('<rss version="2.0">', file=outf)
+	print('<channel>', file=outf)
+	print('<title>' + title + '</title>', file=outf)
+	print('<link>' + url + '</link>', file=outf)
+	print('<description>' + description + '</description>', file=outf)
+	print('<language>en-uk</language>', file=outf)
+
+	# Walk every text file in the posts directory
+	for root, dirs, files in os.walk(posts_directory):
+		for filename in files:
+			if filename.endswith(".txt"):
+
+				# Unpack the date from the filename
+				year = int(filename[0:4])
+				month = int(filename[5:7])
+				day = int(filename[8:10])
+				hour = int(filename[11:13])
+				minute = int(filename[14:16])
+				second = int(filename[17:19])
+
+				# Generate the date string (GMT+0 fixed)
+				d = datetime(year, month, day, hour, minute, second, 0, GMT0(year))
+				dstr = d.strftime("%a, %d %b %Y %H:%M:%S %z")
+
+				# Read a limited subset of the post
+				f = open(os.path.join(root, filename), "rb")
+				content = str(f.read(256), "ascii")
+				f.close()
+
+				# Pull out the title and escape it
+				start = content.index("<<") + 2
+				end = content.index(">>")
+				title = content[start:end]
+				title = title.replace("&", "&amp;")
+
+				# The rest is a small description of the post
+				content = content[end + 2:].lstrip()
+
+				link = url + "?d=" + filename[:-4]
+
+				# Generate the RSS for this post
+				print("<item>", file=outf)
+				print("<title>" + title + "</title>", file=outf)
+				print("<link>" + link + "</link>", file=outf)
+				print("<guid>" + link + "</guid>", file=outf)
+				print("<pubDate>" + dstr + "</pubDate>", file=outf)
+				print("<description>" + content + "</description>", file=outf)
+				print("</item>", file=outf)
+
+	print("</channel>", file=outf)
+	print("</rss>", file=outf)
+
+	outf.close()
+				
+
+
+
 print("-"*60)
 BuildTinyBlogMin()
 print()
 CompressJavascriptFile(js_min_file)
 for js_file in js_extern_files:
 	CompressJavascriptFile(js_file)
+BuildRSS(rss_title, rss_description, rss_url, rss_posts, rss_output)
 print("-"*60)

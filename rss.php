@@ -1,5 +1,6 @@
 <?php
-//header('Content-Type: text/xml');
+header('Content-Type: text/xml');
 require("Code/Utils.php");
-GenerateRSSFeed("Gazoo.cpp", "An independent developer in the wild", "http://donw.org/b/", "BST");    
+$text = ReadTextFile("rss.xml");
+echo $text;
 ?>
