@@ -1,0 +1,46 @@
+<<Star: Planets, Smooth Voxels and Runtime C++ Reloading>>
+
+In a previous post I hinted at my next decision: is the game set on an island? I think from the title of this post, you can guess that it isn't :)
+
+== Let's Render Planets! ==
+
+The noise generation, voxelisation and final polygon creation work on a separate worker thread that I let Windows assign off to any free cores you might have. As I can use any distance generation function I please, I figured I'd try out generating a planetary sphere, modified by noise:
+
+||{{http://farm9.staticflickr.com/8060/8267948384_7d29a2a881.jpg|http://farm9.staticflickr.com/8060/8267948384_7d29a2a881_b.jpg}}||
+
+This is a planet of roughly 256 kilometres in radius, with a procedurally generated voxel surface. From this vantage point, the gaps between various levels of detail are clearly visible. The voxels aren't cached - discarded after the polygons are generated - but they are compressed to 16-bit fixed-point so that the marching cubes algorithm can be exactly sure when a vertex must be placed on a voxel corner. It also made the inner-loop of polygon generation much faster.
+
+The blue/green/white colours are generated based on y-value only, matching the old heightfield renderer.
+
+As I wanted to generate an awful lot of polygons, I added a slice history buffer to the marching cubes generation. This would keep track of the indices of vertices generated in a previous slice so that they could be reused whenever possible. This reduced the vertex memory required to 40% of the original. I also added generation of normals to get a smoother render:
+
+||{{http://farm9.staticflickr.com/8360/8267949814_8e0b9a1788.jpg|http://farm9.staticflickr.com/8360/8267949814_8e0b9a1788_b.jpg}}||
+
+Normals were now generated directly from the distance field and I'd optimised the polygon generation enough that the normalisation of these normals became the bottleneck.
+
+== Runtime Code Reloading ==
+
+One of the debugging features I added in this cycle was runtime code reloading. As the entire game was backed by {clReflect|https://bitbucket.org/dwilliamson/clreflect}, I could walk the pointer graph for every live object in the game. These steps would occur:
+
+* After compiling the C++ code, the Python build script would copy the generated files to the server.
+* The build script would generate a manifest file that contained an MD5 of all the server content.
+* The Java applet would periodically download the manifest file, looking for changes. If the MD5 differed, it would download any of the changes.
+* The Java applet would instruct the changed executable or DLL (module) to shutdown, persisting its state to memory.
+* Any modules which referenced objects in the reloading module would backup their pointers/references.
+* The applet would reload the new executable or DLL (module).
+* Upon launch, the module would reload its prior state and any dependent modules would update their pointers to the new objects.
+
+I put a lot of effort into build times so typical turn-around was under 1 second. clReflect serialisation would seamlessly handle any changed data formats so I could sit in the game and change code and data types at will, for as long as I wanted. I'm hoping to do a much bigger article about this process at a later date when I can guarantee my solution is scalable. For now, checkout my {Splinter Cell Reflection|http://www.altdevblogaday.com/2012/01/03/reflection-in-c-part-2-the-simple-implementation-of-splinter-cell/} article for a similar system I wrote back in 2006.
+
+== Am I crazy? ==
+
+At this point, I'd deconstructed the entire game. There was no physics, collision or character locomotion - that was all based on the heightfield code I wrote a few months earlier. I set out on a huge gamble that I am to this day fighting with. These differences from the normal flow of game development have cost me some serious stress, time and complexity:
+
+* Everything has to be instantaneously renderable from multiple cameras at the same time.
+* Any motion has to be replayable, with any point in time accessible instantly.
+* The surface is a completely arbitrary distance field, 
+* Rendering can occur from any point on the surface of the planet or way above it.
+
+Sleep was scarce around this time period, purely because of worry. I would regularly wake up suddenly at 4am in the morning with my brain chewing over all the problems I was anticipating. If I'd left this as an island, I would be much further along by now... but, damn. I figure, I'm not going to be capable of this kind of work forever, so I might as well work on the types of things I've always dreamed of working on. Imagine being able to create your own space opera!
+
+[disqus][/disqus]

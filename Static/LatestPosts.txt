@@ -1,4 +1,6 @@
 [lit]<div style="font-size:8pt; line-height:1.3em;">[/lit]**LatestPosts**
+{Very Fast, High-Precision SIMD/GPU Gradient Noise|2012-12-17-11-38-22}
+{Star: Planets, Smooth Voxels and Runtime C++ Reloading|2012-12-12-19-20-54}
 {Star: Distance Fields to Voxels to Polygons|2012-12-06-10-34-03}
 {Star: Record/Playback and a New Window Manager|2012-11-30-12-30-01}
 {Star: Native Browser Games & Tools with clReflect|2012-11-22-13-08-40}

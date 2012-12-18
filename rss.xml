@@ -195,5 +195,23 @@ Here's a quick shot of the Editing Room at that poin</description>
 <pubDate>Thu, 06 Dec 2012 10:34:03 +0000</pubDate>
 <description>At this point things were looking pretty good: I setup a few car chases and did some bullet-proofing of clip composition for movies. The next stage was to figure out how the world would look and stream/gen</description>
 </item>
+<item>
+<title>Star: Planets, Smooth Voxels and Runtime C++ Reloading</title>
+<link>http://donw.org/b/?d=2012-12-12-19-20-54</link>
+<guid>http://donw.org/b/?d=2012-12-12-19-20-54</guid>
+<pubDate>Wed, 12 Dec 2012 19:20:54 +0000</pubDate>
+<description>In a previous post I hinted at my next decision: is the game set on an island? I think from the title of this post, you can guess that it isn't :)
+
+== Let's Render Planets! ==
+
+The noise gen</description>
+</item>
+<item>
+<title>Very Fast, High-Precision SIMD/GPU Gradient Noise</title>
+<link>http://donw.org/b/?d=2012-12-17-11-38-22</link>
+<guid>http://donw.org/b/?d=2012-12-17-11-38-22</guid>
+<pubDate>Mon, 17 Dec 2012 11:38:22 +0000</pubDate>
+<description>A recently published article by Inigo Quilez on {Voronoi Edges|http://www.iquilezles.org/www/articles/voronoilines/voronoilines.htm} highlights the technique of shifting the co-ordinate frame of pr</description>
+</item>
 </channel>
 </rss>
