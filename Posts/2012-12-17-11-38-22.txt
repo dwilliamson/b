@@ -1,4 +1,3 @@
-
 <<Very Fast, High-Precision SIMD/GPU Gradient Noise>>
 
 A recently published article by Inigo Quilez on {Voronoi Edges|http://www.iquilezles.org/www/articles/voronoilines/voronoilines.htm} highlights the technique of shifting the co-ordinate frame of procedural algorithms to improve precision. This is a really important little trick that I felt was worth reviewing, as it provides huge benefits to world generation at a planetary scale. The GPGPU crowd have used similar techniques for a while, dubbed {Mixed Precision Methods|http://www.mpi-inf.mpg.de/~strzodka/projects/double/} and the first reference I can find to using relative values for "Infinite noise" is in Pixar's paper on {Wavelet Noise|http://graphics.pixar.com/library/WaveletNoise/paper.pdf}.
