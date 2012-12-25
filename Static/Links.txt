@@ -16,6 +16,7 @@
 {Lambda the Ultimate|http://lambda-the-ultimate.org/}
 {Maciej Sinilo|http://msinilo.pl/blog}
 {Marco Salvi|http://pixelstoomany.wordpress.com/}
+{Martin Ecker|http://www.martinecker.com/martincodes}
 {Naty Hoffman|http://renderwonk.com/blog/}
 {Physics Animation|http://animationphysics.wordpress.com/}
 {Real-Time Rendering|http://www.realtimerendering.com/blog}

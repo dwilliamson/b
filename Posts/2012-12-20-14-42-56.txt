@@ -1,0 +1,70 @@
+<<Star: Transvoxel Level of Detail and Collision>>
+
+For some reason my brain went into overdrive when handling the gaps between LOD levels - no gap was too small to need a fix. In retrospect, maybe moving back to restore the gameplay code as soon as voxels were implemented would have saved on anxiety - having nothing but a landscape renderer to show for a long period of effort can really dent your confidence. However, if I couldn't get the gaps fixed, voxels were off the cards and I'd have to choose a different strategy.
+
+=== Voxel Level of Detail ===
+
+LOD for voxels is a very tricky topic, covering a lot more than just gaps between levels of detail. With heightfield terrain you can do things as crude as dropping "skirts" to cover up gaps - that's not really possible with voxels and developing equivalents to something like ROAM aren't straight forward. Three big examples of achieving this are:
+
+* {Genova Terrain Library|http://www.petervenis.com/genova/index.htm} by Peter Venis, using a variant of surface nets that he claims to have developed independently. As a hobby programmer at the time, that's quite an achievement!
+* {HVox|http://www.gpstraces.com/sven/main/publications.htm} by {Sven Forstmann|http://voxels.blogspot.nl/}, using a 3D extension of clip maps. Information on this is very hard to come by, limited to conference posters and the like. Not great but the demos demonstrate it seems to work.
+* {Transvoxels|http://www.terathon.com/voxels/} by Eric Lengyel. This resolves ambiguities in the Marching Cubes algorithm and fixes seams using a new type of transition cell.
+
+Mikola Lysenko has recently written a great {blog post|http://0fps.wordpress.com/2012/08/20/simplifying-isosurfaces-part-2/} on each of these.
+
+I needed something that I could get working with as little experimental time as possible and the Transvoxel algorithm was too good to pass up, with these major benefits:
+
+* It's in use today in an engine that you can license.
+* The algorithm is exceptionally well documented in Eric's {PhD Thesis|http://www.terathon.com/lengyel/Lengyel-VoxelTerrain.pdf}.
+* While the source code isn't available, Eric provides the {lookup tables|http://www.terathon.com/voxels/Transvoxel.cpp} required to get started.
+* The thesis covers a number of techniques to optimise performance and memory use which you'd be hard-pressed to find elsewhere.
+
+When I decided to go for this, I took the day off, went to my favourite coffee shop and did all the reading I could. While I have no income at the moment, working on my own stuff is not without its benefits :)
+
+=== Transvoxels ===
+
+I think I've spent close to 4 weeks total on the level of detail implementation and scaling up to massive worlds (more of that in a later post). For now, here was my first attempt:
+
+||{{http://farm9.staticflickr.com/8355/8292891350_5fd916071c.jpg|http://farm9.staticflickr.com/8355/8292891350_5fd916071c_b.jpg}}||
+
+The RGB colourings mark node boundaries on each axis. The fully shaded view looked like this:
+
+||{{http://farm9.staticflickr.com/8075/8292883864_2b351a87c6.jpg|http://farm9.staticflickr.com/8075/8292883864_2b351a87c6_b.jpg}}||
+
+Overhangs, tunnels underground, floating chunks of land; this thing could smoothly render anything! But it was the bane of my life for a number of weeks. Every little detail in the PhD has to be accounted for or you'll get slight slivers of gaps causing distraction and disengagement. These "sparklies" would be everywhere, looking like this when zoomed in:
+
+||{{http://farm9.staticflickr.com/8357/8291838873_f8bba37571.jpg|http://farm9.staticflickr.com/8357/8291838873_f8bba37571_b.jpg}}||
+
+Even when I got to the point of knowing I'd covered all implementation details there were a few things not mentioned in the thesis that you have to figure out. For example:
+
+* There is a little trick covered that guarantees the winding order of neighbouring cells is the same: in the history info LUT for regular cells, you choose the lowest vertex as the first when interpolating between edge end-points. This ensures the graphics hardware interpolates that edge similarly to its neighbour. Unfortunately, when building transition cells, this information isn't available so I chose another strategy: I chose edge end-points based on lowest value in the distance field being sampled: worked a treat!
+* Transition cells generate vertices by interpolating edges between 13 vertices. It's constrained, however, by the requirement that the front 4 corners must match the back 4 corners exactly, allowing it to generate a 9 bit code into a reasonably-sized LUT. This has the implicit requirement that if a neighbouring node is at a lower detail, it must be downsampled using nearest neighbour - anything else will cause gaps. By adding an extra layer of cells along each transition, you can slightly extend the algorithm to account for other downsampling methods.
+
+There were a few others but they're buried deep in my Mercurial changesets. I also extended the algorithm in many ways to suit my large-scale requirements, for example:
+
+* Each node has its own fixed point scale, determined by the size of the node. This allowed me to compress distance field values into 16-bit irrespective of the node's distance from the camera.Obviously, this means generated transition vertices won't exactly match their neighbours and cause minor sparklies. I initially played around with interpolating the fixed point scale within nodes but found a simpler solution, carefully selecting different vertex values for generating transition codes vs. interpolating edges.
+* The original algorithm works entirely in fixed point giving a very nice, integer branch method of determining whether generated vertices should be on either edge point. This does mean that the resulting interpolation value is quantised somewhat. I found a way of retaining the integer branch, reducing the work required and getting a higher resolution floating point interpolation parameter for smoother results.
+
+There was a bunch of other stuff and this kind of thing will eat your time fast. You can just keep going and going making it faster and faster. But I can't afford to do that!
+
+=== Physics, Collision Detection and Gameplay ===
+
+I remember the first time I solved the LOD issue vividly - I was over the moon that I could finally go back to getting the gameplay working again. I ditched my old heightfield collision shape modifier and built a custom collision shape for Bullet that would cache small nets of collision around the contact points of any game objects.
+
+This would run on the main thread and block until the results were ready so that I could be as deterministic as possible. As a result, the node sizes were tiny, around 4x4x4:
+
+||{{http://farm9.staticflickr.com/8360/8292883978_f67c1ca81e.jpg|http://farm9.staticflickr.com/8360/8292883978_f67c1ca81e_b.jpg}}||
+
+Cars that you can film in a voxel world! At last! I can't remember the period of time that the game was offline while I figured this all out, but I'll feel the fear for a while :)
+
+One of the major changes that I put into the physics was flipping the switch in Bullet to use doubles instead of floats. This was to handle simulating physics at 256km from the origin (this is a planet, after all). There were a few teething problems with my custom CRT implementation but I was really impressed with how easy it was to switch Bullet over - and there was no noticeable performance hit.
+
+The entity system was ported to doubles while the graphics engine continued to use floats. All graphics objects were stored relative to the scene-active camera position, which had the side-effect of making some shader techniques a little simpler!
+
+=== Next ===
+
+This is my last post before Christmas. The next one is going to be pretty cool, revealing what's really possible with the voxel/distance field approach, and the kind of things I hope to put in the power of player's hands next year :)
+
+Have a great apocalypse!
+
+[disqus][/disqus]
