@@ -17,12 +17,22 @@
 	z-index:1;
 }
 
+#mygame
+{
+	position:absolute;
+	top:70px;
+	left:3%;
+	width:70%;
+	height:200px;
+	z-index:1;
+}
+
 #content
 {
 	position:absolute;
 	left:3%;
 	width:70%;
-	top:70px;
+	top:170px;
 	z-index:1;
 }
 
@@ -66,4 +76,10 @@
 {
 	background:#FFF;
 	border: 1px solid #AAA;
+}
+
+#mygame .post
+{
+	padding:3px;
+	border:#777 solid 1px;
 }

@@ -20,7 +20,7 @@ At the start, I had several very interesting problems to solve, including:
 
 {clReflect|clReflect} has proven to be my biggest visible achievement so far. It's helped me solve so many problems very simply and has many more goodies yet to be released. Here's a teaser of how clReflect has helped me with the native code/javascript interop:
 
-{{https://p.twimg.com/AcDD319CMAAfBpj.jpg|https://p.twimg.com/AcDD319CMAAfBpj.jpg}}
+||{{https://p.twimg.com/AcDD319CMAAfBpj.jpg|https://p.twimg.com/AcDD319CMAAfBpj.jpg}}||
 
 Since I took the screenshot, the process has simplified further and it's a joy to use. Once the game becomes public and I've eased my paranoia, I'll write a few posts on the rest of the stuff.
 

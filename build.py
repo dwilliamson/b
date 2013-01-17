@@ -16,6 +16,7 @@ js_files = [
 	"Code/ParserState_Wiki.js",
 	"Code/Parser.js",
 	"Code/BlogEngine.js",
+	"Code/ImageBrowser.js",
 ]
 
 js_extern_files = [

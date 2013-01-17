@@ -1,0 +1,30 @@
+[lit]
+	<div class="image_browser"
+		onmousedown="OnImageBrowserMouseDown(event)"
+		onmouseup="OnImageBrowserMouseUp(event)"
+		onmouseout="OnImageBrowserMouseOut(event)"
+		onmousemove="OnImageBrowserMouseMove(event)">
+
+		<img src="Images/MyGameBar/ONeillCylinder2.png" link="2013-01-07-16-41-34">
+		<img src="Images/MyGameBar/ONeillCylinder.png" link="2013-01-07-16-41-34">
+
+		<img src="Images/MyGameBar/VoxelCollision.png" link="2012-12-20-14-42-56">
+		<img src="Images/MyGameBar/SmoothVoxels.png" link="2012-12-20-14-42-56">
+		<img src="Images/MyGameBar/TransvoxelTransitions.png" link="2012-12-20-14-42-56">
+
+		<img src="Images/MyGameBar/SmoothNormals.png" link="2012-12-12-19-20-54">
+		<img src="Images/MyGameBar/VoxelPlanet.png" link="2012-12-12-19-20-54">
+
+		<img src="Images/MyGameBar/VoxelLOD.png" link="2012-12-06-10-34-03">
+		<img src="Images/MyGameBar/AdaptiveOctree.png" link="2012-12-06-10-34-03">
+		<img src="Images/MyGameBar/MarchingCubes.png" link="2012-12-06-10-34-03">
+
+		<img src="Images/MyGameBar/VideoPlayer.png" link="2012-11-30-12-30-01">
+
+		<img src="Images/MyGameBar/GameInBrowser.png" link="2012-11-22-13-08-40">
+
+		<img src="Images/MyGameBar/PhysicsAndShading.png" link="2012-11-15-12-43-24">
+
+		<img src="Images/MyGameBar/FirstScreenshot.png" link="2012-11-07-17-10-02">
+	</div>
+[/lit]

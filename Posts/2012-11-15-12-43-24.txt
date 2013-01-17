@@ -29,13 +29,13 @@ On top of that, I added my own version of windows.h, a little trick I used on {S
 
 The next step was some interaction! I set out on a 6 month prototyping adventure, with the goal of testing as many of the risky aspects of my game idea as possible, so visuals were far from being a priority. However, a playing area looks a bit dull without a little bit of lighting! The first thing I did was calculate normals for the heightfield and do some basic N.L shading based on some arbitrary light direction:
 
-||{{http://farm9.staticflickr.com/8205/8185789044_de638341d1.jpg|url:http://www.flickr.com/photos/donw/8185789044/}}||
+||{{http://farm9.staticflickr.com/8205/8185789044_de638341d1.jpg|http://farm9.staticflickr.com/8205/8185789044_de638341d1_b.jpg}}||
 
 The sky colour was initially red so that I could flicker between two different colours to double-check presenting to the window was working. Normals were calculated directly from the heightfield and I think its size was around 1024x1024 - I can't remember exactly.
 
 As I didn't want to spend any time loading assets and wanted to get to the gameplay challenges as soon as possible, I added a few primitive generators:
 
-||{{http://farm9.staticflickr.com/8207/8185749175_b0d46a6126.jpg|url:http://www.flickr.com/photos/donw/8185749175}}||
+||{{http://farm9.staticflickr.com/8207/8185749175_b0d46a6126.jpg|http://farm9.staticflickr.com/8207/8185749175_b0d46a6126_b.jpg}}||
 
 These were just simple primitives, such as spheres, planes, cubes, cylinders, cones and a whole bunch of others that would try to render as strips; the plan was to use them as gameplay avatars during prototyping. For some reason I also changed the resolution to something like 640x480 (it may have been to test out some aspect ratio code).
 
@@ -47,7 +47,7 @@ I've written several physics and collision detection systems in the past and was
 
 I hooked up Bullet in its own DLL, for which updates should be very, very rare (and it isolates me from any excessive code build times associated with a large project such as that). I also made Bullet use my custom CRT, changes I've not yet submitted patches for (a CRT-independent Bullet would definitely aid its portability):
 
-||{{http://farm9.staticflickr.com/8349/8185789362_b827e6d3cd.jpg|url:http://www.flickr.com/photos/donw/8185789362}}||
+||{{http://farm9.staticflickr.com/8349/8185789362_b827e6d3cd.jpg|http://farm9.staticflickr.com/8349/8185789362_b827e6d3cd_b.jpg}}||
 
 This image shows the physics hooked up to the game, with a custom heightfield collider. The existing Bullet collider doesn't correctly account for internal edges and I wrote {a post|http://bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=7498} about my solution so that others may benefit.
 

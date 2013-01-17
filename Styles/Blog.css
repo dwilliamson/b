@@ -72,11 +72,6 @@ a:hover
 	border-bottom: 1px dotted #ba0000;
 }
 
-/* Remove borders around IE image links */
-a { outline: none; }
-a img { outline: none; }
-img { border: 0; }
-
 /* Mouse hover over post title */
 a.title:hover
 {
@@ -153,6 +148,55 @@ h1
 .dygraph-title { font-family: Verdana; font-size: 14px; }
 
 
+/* Remove borders around IE image links */
+a { outline: none; }
+a img { outline: none; }
+img { border: 0; }
+
+/* Put a border around all image links */
+.image img
+{
+	border: #CCC solid 6px;
+	padding: 2px;
+	border-radius: 5px;
+}
+.bordered_image img
+{
+	border: #CCC solid 6px;
+	padding: 2px;
+	border-radius: 5px;
+}
+
+/* Undo the hover underline for images */
+a.image:hover
+{
+	border-bottom: 0px;
+	text-decoration: none;
+}
+a.bordered_image:hover
+{
+	border-bottom: 0px;
+	text-decoration: none;
+}
+
+
+.image_browser
+{
+	width:100%;
+	height:75px;
+	background-color:#EEE;
+	overflow:hidden;
+	white-space: nowrap;
+}
+.image_browser img
+{
+	width:100px;
+	height:75px;
+	display:inline-block;
+	cursor:pointer;
+}
+
+
 /* A set of nested div ids for displaying an image */
 /* The appearance of nesting is achieved with increasing z-indices with no inheritance */
 #image_background
@@ -161,7 +205,6 @@ h1
 	position:fixed;
 	background-color:#000;
 	opacity:0.5;
-	/*filter:alpha(opacity=0.5);*/
 	top:0px;
 	left:0px;
 	margin:0;

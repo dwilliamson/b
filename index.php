@@ -11,6 +11,7 @@
 	<body id="background">
 	
 		<div id="menu"></div>
+		<div id="mygame"></div>
 		<div id="content"></div>
 		<div id="info"></div>
 
@@ -21,8 +22,6 @@
 			// Setup global disqus variables
 			var disqus_shortname = 'gazoo';
 			var disqus_identifier = get_url_parameters()["d"];		// There can only be one page with comments so this works fine
-			//var disqus_url = 'http://donw.org/b';
-			//var disqus_developer = 1;
 		</script>
 		
 		<?php
@@ -31,11 +30,10 @@
 		?>
 
 		<script language="javascript">
-		
+
 			// Sort blog posts by date, latest first
 			blog_posts.sort();
 			blog_posts.reverse();
-			//blog_posts = [ "Static/About.txt" ]
 
 			var blog_engine = new BlogEngine();
 			var archive_page = build_archive_page(blog_posts);
@@ -54,6 +52,7 @@
 
 			// Menu and side bar
 			blog_engine.DisplayPosts("#menu", [ "Static/Menu.txt" ], null, post_callback, true)
+			blog_engine.DisplayPosts("#mygame", [ "Static/MyGame.txt" ], null, post_callback, true)
 			blog_engine.DisplayPosts("#info", [ "Static/SocialNetworks.txt", "Static/LatestPosts.txt", archive_page, "Static/Links.txt" ], null, post_callback, true)
 
 

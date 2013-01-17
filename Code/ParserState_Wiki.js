@@ -60,14 +60,52 @@ function ParserState_Wiki(parser)
 			}
 		}
 
+		function make_url_link(url, allow_new_target, class_name)
+		{
+			// Assume an external target
+			var target = allow_new_target ? 'target="new"' : null;
+
+			// No prefix means it's a local page reference
+			if (url.indexOf("http") != 0)
+			{
+				url = "javascript:blog_goto('" + url + "')";
+				target = null;
+			}
+
+			// Construct the link
+			var link = '<a href="' + url + '"';
+			if (class_name)
+				link = link + ' class="' + class_name + '"'; 
+			if (target)
+				link = link + ' ' + target;
+			link = link + '>';
+
+			return link;
+		}
+
 		// Check for image links
 		if (url = this.parser.match(img_pattern, "{"))
 		{
 			images = url[0].slice(2, -2).split("|");
-			if (images[1].indexOf("url:") == 0)
-				this.parser.add_html('<a href="' + images[1].replace("url:", "") + '" target="new"><img src="' + images[0] + '"></a>');
+			url = images[1];
+
+			var is_url_link = url.indexOf("url:") == 0;
+			if (is_url_link)
+				url = url.replace("url:", "");
+
+			// Convoluted logic that makes up for the lack of the user being able to configure image display
+			// TODO: Fix this!
+			var is_external_url_link = is_url_link && url.indexOf("http") == 0;
+			var class_name = "";
+			if (is_external_url_link)
+				class_name = null;
+			else if (is_url_link)
+				class_name = "bordered_image";
 			else
-				this.parser.add_html('<a href="' + images[1] + '" class="image"><img src="' + images[0] + '"></a>');
+				class_name = "image";
+
+			var link = make_url_link(url, is_url_link, class_name);
+			this.parser.add_html(link + '<img src="' + images[0] + '"></a>');
 			return;
 		}
 
@@ -75,15 +113,8 @@ function ParserState_Wiki(parser)
 		else if (url = this.parser.match(url_pattern, "{"))
 		{
 			url = url[0].slice(1, -1).split("|");
-			if (url[1].indexOf("http") == 0)
-				this.parser.add_html('<a href="' + url[1] + '" target="new">' + url[0] + '</a>');
-
-			else
-			{
-				// No prefix means it's a local page reference
-				html = '<a href="javascript:blog_goto(' + "'" + url[1] + "')" + '">' + url[0] + '</a>';
-				this.parser.add_html(html);
-			}
+			var link = make_url_link(url[1], true);
+			this.parser.add_html(link + url[0] + '</a>');
 		}
 
 		// Check for title tags

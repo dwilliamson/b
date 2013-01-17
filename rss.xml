@@ -220,5 +220,19 @@ The noise gen</description>
 <pubDate>Thu, 20 Dec 2012 14:42:56 +0000</pubDate>
 <description>For some reason my brain went into overdrive when handling the gaps between LOD levels - no gap was too small to need a fix. In retrospect, maybe moving back to restore the gameplay code as soon as voxe</description>
 </item>
+<item>
+<title>Star: Space Colonies with Simple Maths</title>
+<link>http://donw.org/b/?d=2013-01-07-16-41-34</link>
+<guid>http://donw.org/b/?d=2013-01-07-16-41-34</guid>
+<pubDate>Mon, 07 Jan 2013 16:41:34 +0000</pubDate>
+<description>During one of my sleepless nights I was going over all the benefits and drawbacks of distance functions and my mind wandered onto their flexibility. Given that the base distance function is just the distance fr</description>
+</item>
+<item>
+<title>Star: Kinect Acting with Inverse Kinematics</title>
+<link>http://donw.org/b/?d=2013-01-16-11-52-29</link>
+<guid>http://donw.org/b/?d=2013-01-16-11-52-29</guid>
+<pubDate>Wed, 16 Jan 2013 11:52:29 +0000</pubDate>
+<description>I think we're about up to the middle of last year in these posts and at this point I was feeling a little too confident: I'd cracked the voxel nut and was well on my way to larger worlds. What next? Let's </description>
+</item>
 </channel>
 </rss>

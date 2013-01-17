@@ -9,7 +9,7 @@ A long time passed between development of the previous screenshots and the ones 
 
 This is a shot of being "On Set" in the game:
 
-||{{http://farm9.staticflickr.com/8490/8208806614_3bf71f8d4b_z.jpg|url:http://www.flickr.com/photos/donw/8208806614}}||
+||{{http://farm9.staticflickr.com/8490/8208806614_3bf71f8d4b_z.jpg|http://farm9.staticflickr.com/8490/8208806614_3bf71f8d4b_b.jpg}}||
 
 It took a while to get to this point and there are multiple builds of the game that represent the version I use for development and the version that I want to ship to players.
 
@@ -57,7 +57,7 @@ Any new game updates are automatically updated and all my data is JSON-serialise
 
 Finally, I roughed out the "Editing Room" tab for bringing all your clips together into a movie:
 
-||{{http://farm9.staticflickr.com/8341/8207716695_8b00338f9a_z.jpg|url:http://www.flickr.com/photos/donw/8207716695/}}||
+||{{http://farm9.staticflickr.com/8341/8207716695_8b00338f9a_z.jpg|http://farm9.staticflickr.com/8341/8207716695_8b00338f9a_b.jpg}}||
 
 None of that was functional, but the ability to quickly mock-up the user interface in HTML/Javascript was really nice. The game window is just a translated version of the On Set window.
 

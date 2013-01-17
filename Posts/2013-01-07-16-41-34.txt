@@ -1,0 +1,31 @@
+<<Star: Space Colonies with Simple Maths>>
+
+During one of my sleepless nights I was going over all the benefits and drawbacks of distance functions and my mind wandered onto their flexibility. Given that the base distance function is just the distance from the planetary sphere with added noise, could I use other base functions instead? I put the idea to sleep and got up early the next day - it took me a couple of hours to get this:
+
+||{{http://farm9.staticflickr.com/8184/8346719391_ccc5927748.jpg|http://farm9.staticflickr.com/8184/8346719391_ccc5927748_b.jpg}}||
+
+This is the classic {O'Neill Cylinder|http://en.wikipedia.org/wiki/O'Neill_cylinder}, popularised in Arthur C. Clarke's {Rendezvous with Rama|https://www.google.co.uk/search?q=Rendezvous+with+Rama}. Eric Bruneton wrote an amazing {Rama Renderer|http://ebruneton.free.fr/rama3/rama.html} years back and my two hours of playing falls far short. However, some key differences are that I was able to get all my game logic and physics to interact with this world, and it's all voxels - as evidenced by the overhangs.
+
+=== Modelling other worlds ===
+
+As my base spatial structure is an octree, the kind of worlds I can achieve are limited only by imagination: heightfields have been well and truly buried :)
+
+This new flexibility requires some significant leg-work, configurable with world type:
+
+* The base distance function needs to be defined. This could be a sphere, hemisphere, cylinder, cube, dome (ala {Silent Running|http://www.imdb.com/title/tt0067756/}), band, Mobius strip or any other crazy structure you can think of. While this is the "easy bit", a lot of wild imagination is required to make a function that will surprise people and I find it difficult to switch out of "technical mode."
+* The "up vector" for all entities will vary based on where they are. There was a lot of stuff that needed changing; the simple example being my cameras. Given that I use raycast suspension for my cars, I also had to change them. Depending on project size, retrofitting this kind of thing can be tricky.
+* The physics gravity vector will change along with the up vector. While Bullet supports the notion of a custom gravity magnitude, the vector is fixed. This is easy to solve by disabling that and adding manual force updates to each object. A more efficient solution would be to directly build it into your own Bullet world simulator (i.e. replace --btDiscreteDynamicsWorld-- completely).
+* The atmospheric model needs to be adapted. While there is no real atmospheric model to speak of in the above screenshots (the current build does - I'll show that in a later post), it's a part of your pipeline which will need specific, hard-coded attention.
+* You'll need custom world lighting with your atmosphere model. If you model sun light transmittance from an area light source through the particles of the atmosphere, this will likely change. Not only that: how do you light a closed cylinder in the first place? Strips of light down the middle? Open the ends? Leave sections of the cylinder open? Things could get quite complicated.
+* Any other atmospheric rendering systems need to adapt, such as cloud rendering and weather.
+* Voxel up alignment is hugely important and needs custom attention. When you're a quarter of the way around the surface of a sphere, the top faces of the voxels no longer align with the surface normal, as a heightfield would. I'm not going to talk about this now - you may think that because voxels are smoothly polygonised, this wouldn't matter (I did). However, when I reveal one of the final major features of my game, the need will become clear.
+
+So while it's easy to define new base distance functions, the side-effects are significant. My system does not currently support hot-swappable world types; I have plans to support them at a later date. The way I work, I prefer to see how one world type fully pans out before I waste time writing some silly generic framework that requires continuous maintenance before it's actually useful (cost of development becomes quickly exponential the more use-cases you require).
+
+But for now, proving to myself that this was possible gave me a confidence boost at the time. Before I sign out, here's a floating voxel island on an O'Neill Cylinder:
+
+||{{http://farm9.staticflickr.com/8071/8346719215_eb70e4404b.jpg|http://farm9.staticflickr.com/8071/8346719215_eb70e4404b_b.jpg}}||
+
+There's lots of hope for the future :)
+
+[disqus][/disqus]

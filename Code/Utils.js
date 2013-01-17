@@ -105,6 +105,15 @@ function bind()
 }
 
 
+function cancel_default_action(e)
+{
+	var evt = e ? e:window.event;
+	if (evt.preventDefault) evt.preventDefault();
+	evt.returnValue = false;
+	return false;
+}
+
+
 function Selector(name_or_node)
 {
 	this.Node = name_or_node;
@@ -167,6 +176,16 @@ function Selector(name_or_node)
         return { top: y, left: x };
 	}
 
+	this.width = function()
+	{
+		return this.Node.offsetWidth;
+	}
+
+	this.scroll_width = function()
+	{
+		return this.Node.scrollWidth;
+	}
+
 	this.set_left = function(left)
 	{
 		this.Node.style.left = left + "px";
@@ -223,14 +242,17 @@ get_ajax_document = function(filename, callback)
 	if (req)
 	{
 		// Setup the callback
-		req.onreadystatechange = function()
+		if (callback)
 		{
-			if (req.readyState == 4 && req.status == 200)
-				callback(req.responseText);
+			req.onreadystatechange = function()
+			{
+				if (req.readyState == 4 && req.status == 200)
+					callback(req.responseText);
+			}
 		}
 
-		// Kick-off an async request
-		req.open("GET", filename, true);
+		// Kick-off a request with async if a callback is provided
+		req.open("GET", filename, callback ? true : false);
 		req.send();
 	}
 }

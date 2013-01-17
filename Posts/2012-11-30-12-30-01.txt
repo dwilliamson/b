@@ -4,7 +4,7 @@ Before we head into December, I figured I'd show you some screenshots from the p
 
 Here's a quick shot of the Editing Room at that point:
 
-||{{http://farm9.staticflickr.com/8485/8232472486_b2e6eca168_z.jpg|url:http://www.flickr.com/photos/donw/8232472486}}||
+||{{http://farm9.staticflickr.com/8485/8232472486_b2e6eca168_z.jpg|http://farm9.staticflickr.com/8485/8232472486_b2e6eca168_b.jpg}}||
 
 There are several pretty interesting new features at work here, some of which can't fully be seen unless you see the screenshots of their development. You can view them all by checking out the Flickr history page for this project:
 

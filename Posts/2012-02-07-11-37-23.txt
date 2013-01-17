@@ -25,7 +25,7 @@ The client is a thin client with no real logic or state attached to it. It is di
 
 The simplest of solutions is to select --Debug|Attach to Process...-- in Visual Studio, find your process and click --Attach--:
 
-||{{http://farm8.staticflickr.com/7010/6835176511_b988985c5d_d.jpg|url:http://www.flickr.com/photos/donw/6835176511/}}||
+||{{http://farm8.staticflickr.com/7010/6835176511_b988985c5d_d.jpg|http://farm8.staticflickr.com/7010/6835176511_b988985c5d_d.jpg}}||
 
 I'm sure many of you know this dialogue box intimately - a required tool when a certain, unnamed console stubbornly refuses to launch with the debugger attached.
 

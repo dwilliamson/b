@@ -1,0 +1,16 @@
+<<Star: Kinect Acting with Inverse Kinematics>>
+
+I think we're about up to the middle of last year in these posts and at this point I was feeling a little too confident: I'd cracked the voxel nut and was well on my way to larger worlds. What next? Let's allow the players to act out there own scenes using Kinect, of course!
+
+Oh dear.
+
+I decided to have a go at the following framework:
+
+* Skinned actors needed to be added to the game, with a quick-and-dirty mesh edit/import pipeline.
+* 
+
+The time period lasted about 3 months and I was trying all kinds of different things
+
+Importing from the CMU database with a 
+OpenNL for tracking - didn't try Microsoft's solution but licensing seems to be more liberal these days
+OpenNL has a fixed skeleton 

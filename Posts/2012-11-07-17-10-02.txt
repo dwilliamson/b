@@ -34,7 +34,7 @@ One year ago, the plan for the game was to make movies on an island, as one of m
 
 So once I had some very simple base libraries I needed a means to render an island. This called for a very basic heightfield renderer and a good old plasma generator to randomise the heights:
 
-||{{http://farm9.staticflickr.com/8202/8163775012_3ee904474e.jpg|url:http://www.flickr.com/photos/donw/8163775012/in/photostream}}||
+||{{http://farm9.staticflickr.com/8202/8163775012_3ee904474e.jpg|http://farm9.staticflickr.com/8202/8163775012_3ee904474e_b.jpg}}||
 
 I suppose what's interesting about this little window is that it's just a dummy application that does nothing but send/receive network messages, sending input to the main game executable when it receives it and displaying images whenever the game sends them over. The eventual goal was to host the game in a browser, using all the standard HTML5 tools to build the user interface.
 
