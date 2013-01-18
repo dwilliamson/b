@@ -121,8 +121,8 @@ function ParserState_Wiki(parser)
 		else if (title = this.parser.match(title_pattern, "<"))
 		{
 			title = title[0].slice(2, -2);
-			html = '<a href="javascript:blog_goto(' + "'" + this.parser.document_id + "')" + '" class="title">' + title + '</a><br/>';
-			this.parser.add_html(html);
+			var link = make_url_link(this.parser.document_id, false, "title");
+			this.parser.add_html(link + title + "</a><br/>");
 
 			// Static pages don't have valid dates
 			if (this.parser.date != null)
