@@ -68,7 +68,7 @@ function ParserState_Wiki(parser)
 			// No prefix means it's a local page reference
 			if (url.indexOf("http") != 0)
 			{
-				url = "javascript:blog_goto('" + url + "')";
+				url = "javascript:blog_goto('/b/?d=" + url + "')";
 				target = null;
 			}
 

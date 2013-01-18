@@ -75,7 +75,7 @@
 				if (window.history.pushState)
 				{
 					// On browsers that support pushState, just clear and re-display posts instead of reloading the page
-					window.history.pushState("object or string", "Title", "/b/?d=" + where);
+					window.history.pushState("object or string", "Title", where);
 					display_posts();
 					allow_pop_state = true;
 				}
@@ -83,7 +83,7 @@
 				else
 				{
 					// Otherwise just reload normally
-					window.location = "/b/?d=" + where;
+					window.location = where;
 				}
 			}
 

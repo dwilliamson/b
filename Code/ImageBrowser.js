@@ -59,7 +59,7 @@ function OnImageBrowserMouseUp(e)
 	{
 		var link = e.target.getAttribute("link");
 		if (link)
-			blog_goto(link);
+			blog_goto("/b/?d=" + link);
 	}
 
 	ImageBrowserMouseUp(images);
