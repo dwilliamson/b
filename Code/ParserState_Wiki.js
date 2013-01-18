@@ -66,10 +66,15 @@ function ParserState_Wiki(parser)
 			var target = allow_new_target ? 'target="new"' : null;
 
 			// No prefix means it's a local page reference
+			var onclick = null;
 			if (url.indexOf("http") != 0)
 			{
-				url = "javascript:blog_goto('/b/?d=" + url + "')";
+				// Create the local URL
+				url = "/b/?d=" + url;
 				target = null;
+
+				// Add the pushState click handler
+				onclick = 'onclick="blog_goto(event, ' + "'" + url + "'" + ')"';
 			}
 
 			// Construct the link
@@ -78,6 +83,8 @@ function ParserState_Wiki(parser)
 				link = link + ' class="' + class_name + '"'; 
 			if (target)
 				link = link + ' ' + target;
+			if (onclick)
+				link = link + ' ' + onclick;
 			link = link + '>';
 
 			return link;

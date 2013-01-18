@@ -70,8 +70,13 @@
 			display_posts();
 
 			
-			function blog_goto(where)
+			function blog_goto(e, where)
 			{
+				// If any of the control keys are being held, the user wants to perform an action like opening the page in a new tab
+				// In that case, return straight away and let the browser handle the link
+				if (e && (e.altKey || e.ctrlKey || e.shiftKey || e.metaKey))
+					return;
+
 				if (window.history.pushState)
 				{
 					// On browsers that support pushState, just clear and re-display posts instead of reloading the page
@@ -85,6 +90,10 @@
 					// Otherwise just reload normally
 					window.location = where;
 				}
+
+				// Stop the browser processing the link
+				if (e)
+					cancel_default_action(e);
 			}
 
 			window.onpopstate = function (e)
