@@ -1,0 +1,98 @@
+<<Star: Kinect Acting with IK and a New DirectX 11 Renderer>>
+
+I think we're about up to the middle of last year in these posts and at this point I was feeling a little too confident: I'd cracked the voxel nut and was well on my way to larger worlds. What next? Let's allow the players to act out their own scenes using Kinect, of course!
+
+Oh dear.
+
+I decided to have a go at the following framework:
+
+* Skinned actors needed to be added to the game, with a quick-and-dirty mesh edit/import pipeline.
+* The Kinect skeleton would automatically map to any mesh skeleton you construct.
+* Motion capture using the Kinect would be baked and compressed for use in game animation.
+* Allow mass import and manipulation of motion capture data from other sources.
+
+I also had a crack at auto-skinning, but that's a story for a later date when I talk about yet another major feature addition ;)
+
+=== The Skinned Mesh Pipeline ===
+
+This was the easy bit. I've written a silly amount of mesh/animation import pipelines and animation blending systems, so I took the opportunity to make this one as {optimal as I could|2012-07-19-12-52-03}. I picked {Blender|http://www.blender.org/} as my 3D work environment, as it was free, open-source and most plugins are written in Python; one of my favourite languages. I took a base model called "Adventure Kid", by Clint Bellanger:
+
+||{{http://opengameart.org/sites/default/files/styles/medium/public/adventure_kid.png|url:http://opengameart.org/content/adventure-kid}}||
+
+This is licensed under a {Creative Commons|http://creativecommons.org/licenses/by/3.0/} license. I took out the bowl and sword, re-worked the topology and proportions (so it didn't look like a kid) and used it for my male actors:
+
+||{{http://farm9.staticflickr.com/8056/8391291771_ca73d34563.jpg|http://farm9.staticflickr.com/8056/8391291771_ca73d34563_b.jpg}}||
+
+Blender's Python API is pretty good and Blender itself is a great piece of open-source software. It's not without its many frustrations, but then, no 3D package is innocent of that.
+
+I didn't really need to, but I wrote an animation export/import process from Blender to the game. This was quick to write, once I figured out Blender's transform hierarchies, and served to demonstrate the animation in game worked before I moved onto the motion capture. In keeping with the instant turn-around work I was used to, I also added live reloads of meshes and animations.
+
+=== A DirectX 11 Renderer ===
+
+D3D9 is finally on the way out - D3D11 never provided enough of an incentive for the majority of developers to bring their D3D9 engines over. When you can write cross-platform PC/Xbox 360 code with a few well-placed ifdef's and very low level wrapper classes, it's hard to justify a new higher-level abstraction over D3D11/D3D9 when PC versions of games can get very little funding compared to their console counterparts. There are ways to work-around the D3D9 limitations on PC, such as the very slow driver model.
+
+However, all the latest profiling tools are D3D11-only and the video hardware is catching up. These days there's also an awful lot of new platforms that have become essential to target, and they're using OpenGL, so you really have to think of some form of abstraction.
+
+A good, main-stream graphics engine these days will have 2 levels of abstraction:
+
+* The low-level abstracts away the target API as much as possible, without introducing too many levels of indirection. I've seen this executed badly so many times; the most common mistake is to put many levels of indirection between the rendering engineer and the target API, making your frame rate suffer visibly from the lack of data and code cache locality. It also becomes difficult to add new functionality across the API and all its implementations: the more code you add to an abstraction, the more implicit constraints you apply and dependencies you introduce.
+* The high-level abstracts away the scene rendering from the game. It's typically responsible for marshalling source data for your target platform (e.g. having a platform-specific mesh file format), figuring out what needs to be renderered and when.
+
+If you get it right, none of your game code sees or can even get access to the low-level rendering API. Even better, your high-level abstraction can submit tasks to whatever concurrent task system you have up and running, allowing you to command multiple devices/cores (the "render thread" concept should be long dead, by now).
+
+I went round in circles for a couple of days, figuring out my strategy, and eventually built a very low-level abstraction over D3D11 and OpenGL. I already had the high-level abstraction. Of course, I had to make it as simple possible so that I wasn't introducing a {technical debt|http://martinfowler.com/bliki/TechnicalDebt.html} I couldn't afford to pay back. I'm the only person working on this project, after all.
+
+||{{http://farm9.staticflickr.com/8190/8392376982_515bd606d9.jpg|http://farm9.staticflickr.com/8190/8392376982_515bd606d9_b.jpg}}||
+
+There's a few more things going on in this screenshot:
+
+* There's a new linear lighting model, with a gamma correction stage at the end.
+* A basic {Filmic Tonemapping Operator|http://filmicgames.com/archives/75} runs in the post-process, with a fixed exposure. I expect to get a little more fancy with this stage at a later date.
+* All the forward lighting was pulled in favour of a deferred renderer.
+
+Having easy access to the depth buffer via D3D11 was something I haven't enjoyed since Xbox 360 programming. It felt good :)
+
+=== Kinect Motion Capture ===
+
+The first step was to get some Kinect data on the PC. The API I chose was {OpenNI|http://www.openni.org/} as I had access to an Xbox Kinect, not a PC one. I wrote a C++ server that connected to a device and read back all data live, making joint recordings and giving a simple OpenGL visualisation of what was going on.
+
+The next step was to get this in Blender. I turned the C++ server into a network host that would send skeleton updates to any clients that connected (this was a nice and quick  way for me to use the OpenNI SDK on any platform without having to write a wrapper for it). In Blender, I wrote a Python plugin that would connect to the C++ server and read-back the data. This proved to be very, very confusing as Blender kept crashing out on me. It took me a while to figure out that the Blender API wasn't {thread-safe|http://wiki.blender.org/index.php/Dev:2.4/Source/Python/API/Threads} and that my python thread was killing Blender in a lot of ways.
+
+Once that was sorted, I got onto the task of mapping these joints to the actor skeleton in Blender.
+
+=== Automatic Skeleton Mapping ===
+
+My game skeleton and the Kinect skeletons are different. There are more bones in the game skeleton for a start. The proportions are different, their relative base angles and offsets vary slightly; it's a recipe for complexity. I went a little over the top at this stage, reading all kinds of research papers on auto-skeletonisation and skinning.
+
+I eventually settled on the concept of manually specifying key points shared between the skeletons (hips, hands, feet and shoulders), at which point the code would take over and provide an IK mapping between them. I tried all kinds of IK algorithms and quite enjoyed myself, but I also felt very guilty about getting lost on an academic programming binge when I should have been working back in the game, adding the most basic functionality I could to get player-controlled actors.
+
+Cyclic Co-ordinate Descent (CCD) was the first, as a refresher course in single-chain IK. Of course, joint limits are important when doing biped IK so I took on-board Jonathan Blow's work on {Quaternion joint limits|http://number-none.com/product/IK%20with%20Quaternion%20Joint%20Limits/index.html}. Then came the Jacobian Tranpose and Pseudo Inverse methods, which don't scale to multiple end-effectors well (a requirement for bipeds). Trying to keep things simpler, I tried an iterative {particle-based solver|http://www.gamasutra.com/resource_guide/20030121/jacobson_pfv.htm} (as an aside, I have a lovely old {grass solver|http://donw.org/} you can download that I wrote about 12 years ago while waiting for SEGA to approve our final submission disc). Not content with that, I tried the more recent {Selectively Damped Least Squares|http://math.ucsd.edu/~sbuss/ResearchWeb/ikmethods/SdlsPaper.pdf} method for multiple end effectors. {Chris Welman's thesis|http://graphics.ucsd.edu/courses/cse169_w04/welman.pdf} is a classic introductory text for all this.
+
+The combination of multiple end-effectors and joint constraints was the hardest problem to solve in a stable, time-efficient manner. At this point I tried something simple: what would happen if I oriented the spine of the character to the facing plane of the mocap data and then used the Jacobian to solve multiple, single IK chains for the back and limbs? Here's a video:
+
+||
+[lit]
+<iframe width="560" height="315" src="http://www.youtube.com/embed/Djv3L1BB64o" frameborder="0" allowfullscreen></iframe>
+[/lit]
+||
+
+This is me walking around in my office while the results get mapped on to the character in Blender. At the time, my plugin was pretty primitive, requiring me to "bake" the results to an animation, however I eventually got it real-time in the viewport.
+
+This was an odd route for me to take and was part of the reason I started getting tired and demotivated. I wanted to use Blender as an "immediate mode API", allowing me to debug all of my code before I moved it into the game. However, all the nuances of Blender and its API made this a tougher task than I expected. I was burning myself out on code I didn't need to write before I actually got to the task of porting all my Python code to C++ in the game!
+
+=== Importing Motion Capture Data ===
+
+Not everybody has a Kinect. OpenNI can use other devices, but I'm guessing gamers have even less of the higher-end motion capture devices to hand! During the port of all my code to C++ in the game, I decided to add a BVH importer. One of the best resources for this kind of data is the {
+CMU Graphics Lab Motion Capture Database|http://mocap.cs.cmu.edu/}. You can find {BVH versions|https://sites.google.com/a/cgspeed.com/cgspeed/motion-capture} of all of these files.
+
+On top of that I decided to add a bunch of filters that would make it easier for people to manipulate them without needing expensive 3D software. One of them was {automatic loop generation|2012-08-20-16-07-23}. I generated an idle animation from my Kinect and auto-looped a run and walk animation from the CMU database. There was not enough range with the Kinect for me to generate a stable run cycle.
+
+At this point I had a very powerful consumer mocap animation pipeline and could see some nice consequences for bigger game animation pipelines (retargetting of animations and general rig changes). I should have been immensely happy, but I was tired of 3 months expenditure on something that still needed a lot of UI work and could have been done with less distractions, directly in the game.
+
+=== Final Game Steps ===
+
+Of course, it doesn't stop there. The requirement of making everything recordable for movie editing added many more tasks to my slate. As the movie player bakes entity key presses to resolved 3D positions for scrubbing forward/backward in time on the timeline, the same needed to be achieved for the skeleton animation player without baking individual skeleton key frames.
+
+I stopped the task after all this and will come back to it at a later date when people start using it. It was fun. And tiring. But I needed to work on adding some prettier visuals to motivate myself a little :)
+
+[disqus][/disqus]
