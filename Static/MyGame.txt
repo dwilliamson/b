@@ -5,6 +5,8 @@
 		onmouseout="OnImageBrowserMouseOut(event)"
 		onmousemove="OnImageBrowserMouseMove(event)">
 
+		<img src="Images/MyGameBar/KinectActing.png" link="2013-01-18-11-52-29">
+
 		<img src="Images/MyGameBar/ONeillCylinder2.png" link="2013-01-07-16-41-34">
 		<img src="Images/MyGameBar/ONeillCylinder.png" link="2013-01-07-16-41-34">
 

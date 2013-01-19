@@ -74,7 +74,7 @@ function ParserState_Wiki(parser)
 				target = null;
 
 				// Add the pushState click handler
-				onclick = 'onclick="blog_goto(event, ' + "'" + url + "'" + ')"';
+				onclick = 'onclick="url_push_state(event, ' + "'" + url + "'" + ')"';
 			}
 
 			// Construct the link
