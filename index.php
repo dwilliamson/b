@@ -31,17 +31,16 @@
 
 		<script language="javascript">
 
+			// Set an initial history state so that popstate can ignore the call on page load
+			if (window.history.replaceState)
+				window.history.replaceState("Object or string", null, null);
+
 			// Sort blog posts by date, latest first
 			blog_posts.sort();
 			blog_posts.reverse();
 
 			var blog_engine = new BlogEngine();
 			var archive_page = build_archive_page(blog_posts);
-
-			// For some reason, onpopstate gets called after the page initially loads - could it be disqus?
-			// To prevent loading the frontpage TWICE because of that, use this variable to only allow pop
-			// state to display posts when we know there's been a transition.
-			var allow_pop_state = false;
 
 
 			function post_callback(div)
@@ -72,7 +71,7 @@
 			window.onpopstate = function (e)
 			{
 				// The browser changes the title automatically, so reevaluate parameters and diplay posts
-				if (allow_pop_state)
+				if (e.state)
 					display_posts();
 			}
 

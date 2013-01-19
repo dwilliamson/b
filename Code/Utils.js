@@ -124,9 +124,8 @@ function url_push_state(e, where)
 	if (window.history.pushState)
 	{
 		// On browsers that support pushState, just clear and re-display posts instead of reloading the page
-		window.history.pushState("object or string", "Title", where);
+		window.history.pushState("object or string", null, where);
 		display_posts();
-		allow_pop_state = true;
 	}
 
 	else
