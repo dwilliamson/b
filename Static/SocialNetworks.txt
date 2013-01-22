@@ -23,4 +23,8 @@
 {DCPU-16|https://github.com/dwilliamson/dwilliamson.github.com} - DCPU-16 browser live-edit
 {Gazoo.cpp|https://github.com/dwilliamson/b} - Repository for blog content
 
+[lit] [/lit]**#AltDevBlogADay**
+{Reflection in C++, Part 1|http://www.altdevblogaday.com/2011/09/25/reflection-in-c-part-1-introduction/}: Introduction
+{Reflection in C++, Part 2|http://www.altdevblogaday.com/2012/01/03/reflection-in-c-part-2-the-simple-implementation-of-splinter-cell/}: The Simple Implementation of Splinter Cell
+
 [lit]</div>[/lit]

@@ -1,4 +1,4 @@
-<<Star: Native Browser Games & Tools with clReflect>>
+<<Native Browser Games & Tools with clReflect>>
 
 A long time passed between development of the previous screenshots and the ones I'll show here; I think it was about a month or so. A quick summary of the additions would be:
 

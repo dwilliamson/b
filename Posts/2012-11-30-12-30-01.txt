@@ -1,4 +1,4 @@
-<<Star: Record/Playback and a New Window Manager>>
+<<Record/Playback and a New Window Manager>>
 
 Before we head into December, I figured I'd show you some screenshots from the progress I made prior to the scope of this all going a bit crazy :)
 

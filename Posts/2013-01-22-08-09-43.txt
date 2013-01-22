@@ -1,0 +1,40 @@
+<<Earth-size Voxel Planets with Atmospheric Scattering>>
+
+After 3 months of exhaustive Kinect/IK work, I needed a little motivation boost so I tackled two problems: making much bigger worlds with massive draw distances and putting a pretty atmosphere around the planet. The resolution of a voxel in the below screenshots is about 10cm. Of course, because it's one big crazy distance field tessellated with a scalable Transvoxel implementation, all you see is a smooth landscape.
+
+One thing to bear in mind when looking at all these shots: **everything here has fully integrated movie recording, gameplay, collision and character/vehicle physics.**
+
+||{{http://farm9.staticflickr.com/8049/8403590174_b596cd56f4.jpg|http://farm9.staticflickr.com/8329/8406206756_955141de81_b.jpg}}||
+
+The above shot shows a 3D noise voxel environment with a draw distance of roughly 50km, as is typical on Earth from a couple hundred meters above ground level. The radius of the planet is around 6,200km and the physics was still holding up admirably at such a large distance from the origin. The scattering is a deferred implementation of Eric Bruneton's {Precomputed Atmospheric Scattering|http://www-evasion.imag.fr/Membres/Eric.Bruneton/} paper. Direct lighting is a custom model, as I found Bruneton's model to be too simplistic (it's a 2D function of angle between normal/sun and distance from the origin). The eventual goal was to replace it with it with a much more accurate skylight model.
+
+This is a view close to sunset, showing an actor next to a car:
+
+||{{http://farm9.staticflickr.com/8219/8402498879_32f04ac9db.jpg|http://farm9.staticflickr.com/8496/8405115137_14ff0ecba3_b.jpg}}||
+
+When I took this shot there was a strange bug skewing the projection of objects on-screen, hence the stretched look of everything. The scattering model accounts for all heights inside the atmosphere and outside of it. The following shot shows a view 100km above the surface of the planet:
+
+||{{http://farm9.staticflickr.com/8232/8403590356_1f5c7c85cf.jpg|http://farm9.staticflickr.com/8464/8405114769_ed224d28e2_b.jpg}}||
+
+The voxels in the world are still compressed at 16-bit resolution, dynamically scaled to the minmax distance of whatever node they're a part of. With careful selection of Transvoxel transition cell distances and positions, this scales amazingly well.
+
+A tricky problem was getting a depth buffer encoding that worked at all distances. I tried various logarithmic depth buffers but they had two main artefacts:
+
+* Big polygons wouldn't clip correctly. This wasn't too much of an issue as the surface was finely tessellated. However, as the LOD dynamically adjusts as the camera moves, this became more obvious under speedy movement.
+* The linear interpolation of logarithmic vertex values would cause aliasing in the distance as bigger polygons would alternately overlap each other.
+
+The simplest solution was to just invert the depth buffer and dynamically adjust the near/far plane based on distance to the surface.
+
+This one is a little closer, 50km above the surface and just under the top of the atmosphere:
+
+||{{http://farm9.staticflickr.com/8076/8403590588_551d1baa1c.jpg|http://farm9.staticflickr.com/8211/8406207296_b2f85f0dc1_b.jpg}}||
+
+The landscape is unique everywhere on the surface, with the noise generated entirely in double space. This was pretty slow but at gameplay speeds, not too noticable. As this development was sometime last year, the current build has moved on {significantly since then|2012-12-17-11-38-22}.
+
+Finally, here's a view of the planet from a distance:
+
+||{{http://farm9.staticflickr.com/8369/8402499601_99718f9df8.jpg|http://farm9.staticflickr.com/8049/8405114585_32545b3556_b.jpg}}||
+
+The shot is a bit under-saturated as I was fiddling with the exposure at the time. It's a good highlight of all the work that was still left to build a believable planet out of voxels.
+
+[disqus][/disqus]

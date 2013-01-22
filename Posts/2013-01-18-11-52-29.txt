@@ -1,4 +1,4 @@
-<<Star: Kinect Acting with IK and a New DirectX 11 Renderer>>
+<<Kinect Acting with IK and a New DirectX 11 Renderer>>
 
 I think we're about up to the middle of last year in these posts and at this point I was feeling a little too confident: I'd cracked the voxel nut and was well on my way to larger worlds. What next? Let's allow the players to act out their own scenes using Kinect, of course!
 

@@ -1,4 +1,4 @@
-<<Star: Transvoxel Level of Detail and Collision>>
+<<Transvoxel Level of Detail and Collision>>
 
 For some reason my brain went into overdrive when handling the gaps between LOD levels - no gap was too small to need a fix. In retrospect, maybe moving back to restore the gameplay code as soon as voxels were implemented would have saved on anxiety - having nothing but a landscape renderer to show for a long period of effort can really dent your confidence. However, if I couldn't get the gaps fixed, voxels were off the cards and I'd have to choose a different strategy.
 

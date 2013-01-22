@@ -1,4 +1,4 @@
-<<Star: Scale, Physics and Shading>>
+<<Scale, Physics and Shading>>
 
 My goal for this project is to run in a browser with no installation steps required. This means I can't rely on any software on the host machine that needs to be installed by hand. I also wanted the executables to be as small as possible so that I could ship regular updates and limit the amount of bandwidth I have to pay for.
 

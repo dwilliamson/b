@@ -1,4 +1,4 @@
-<<Star: Distance Fields to Voxels to Polygons>>
+<<Distance Fields to Voxels to Polygons>>
 
 At this point things were looking pretty good: I setup a few car chases and did some bullet-proofing of clip composition for movies. The next stage was to figure out how the world would look and stream/generate as you moved around it.
 

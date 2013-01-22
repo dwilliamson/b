@@ -1,4 +1,4 @@
-<<Star: Space Colonies with Simple Maths>>
+<<Space Colonies with Simple Maths>>
 
 During one of my sleepless nights I was going over all the benefits and drawbacks of distance functions and my mind wandered onto their flexibility. Given that the base distance function is just the distance from the planetary sphere with added noise, could I use other base functions instead? I put the idea to sleep and got up early the next day - it took me a couple of hours to get this:
 

@@ -1,4 +1,4 @@
-<<Star: Planets, Smooth Voxels and Runtime C++ Reloading>>
+<<Planets, Smooth Voxels and Runtime C++ Reloading>>
 
 In a previous post I hinted at my next decision: is the game set on an island? I think from the title of this post, you can guess that it isn't :)
 
