@@ -1,4 +1,7 @@
-[lit]<div style="font-size:8pt; line-height:1.3em;">[/lit]**LatestPosts**
+[lit]<div style="font-size:8pt; line-height:1.3em;">[/lit]**Latest Posts**
+{Impossible Worlds and Distant Sunsets|2013-02-10-12-52-45}
+{Voxel World Sculpting on a Large Scale|2013-01-29-09-12-13}
+{Earth-size Voxel Planets with Atmospheric Scattering|2013-01-22-08-09-43}
 {Kinect Acting with IK and a New DirectX 11 Renderer|2013-01-18-11-52-29}
 {Space Colonies with Simple Maths|2013-01-07-16-41-34}
 {Transvoxel Level of Detail and Collision|2012-12-20-14-42-56}
@@ -11,7 +14,6 @@
 {Announcing: Project Star|2012-11-07-17-10-02}
 {Skeletal Animation Looping with Autocorrelation|2012-08-20-16-07-23}
 {Smoother Assert Response with Visual Studio|2012-08-02-18-01-22}
-{Getting Google to Index AJAX Content|2012-07-27-12-42-30}
 {Quaternions and Dual Quaternion Skinning|2012-07-19-12-52-03}
 {An Implementation of _CIpow|2012-05-15-10-36-23}
 {Risk, Prototypes and Planetary Bodies|2012-04-11-22-56-23}

@@ -1,0 +1,37 @@
+<<Voxel World Sculpting on a Large Scale>>
+
+One of the biggest issues I had to solve early on in the design was how do players add assets to the game world? Should I get a bunch of artists to model varying props and vehicles for different movie types, allowing simple placement? This is what Stunt Island did but I didn't fancy taking that route. The main reason is that it limits the look of movies you can make, preventing you from establishing your own artistic style. Another minor point is that I didn't really have the money to pay somebody to create those assets!
+
+I played around with different ideas, including the manipulation of {CSG primitives|http://en.wikipedia.org/wiki/Constructive_solid_geometry}. Unfortunately, while simple for programmers to understand, composite mathematical operations get complicated very fast. Inspired by the likes of {Sculptris|http://www.pixologic.com/sculptris/}, {3D Coat|http://3d-coat.com/} and ultimately {Minecraft|https://minecraft.net/}, I decided to add distance field sculpting:
+
+||{{http://farm9.staticflickr.com/8092/8424093863_9823f01f29.jpg|http://farm9.staticflickr.com/8092/8424093863_9823f01f29_b.jpg}}||
+
+Editing is simple: select your brush type and paint it across the surface of the world to modify it. Brush types can vary, be they spheres, cubes, cylinders or prefab brushes you clone from the world. Brush weighting can smoothly vary and the modification operation can be union, subtraction, smooth, extrude, and so on. There's a huge amount of fun that can be had in this area but doing it on a planet has opened up some very tricky problems (more of that in a later post).
+
+Under the hood it's all distance field manipulation. I initially used a read-back of the zbuffer to determine where in world-space to make the first ray hit from the mouse, but this introduced too much latency when regenerating the polygons around it. Instead, I switched to sampling the distance field on the CPU and got some pretty smooth editing as a result. It's not quite as polished as Sculptris, but there's enough time to work on that :)
+
+=== Collision Detection ===
+
+Of course, this is all useless unless you can't interact with it. The collision detection maintains its own polygon cache, generated from the world noise function. Whenever voxels are edited, both the polygon cache and physics state around that area get invalidated:
+
+||{{http://farm9.staticflickr.com/8330/8425184246_8ef2ebc506.jpg|http://farm9.staticflickr.com/8330/8425184246_8ef2ebc506_b.jpg}}||
+
+The screenshot above shows a tessellation of the cached collision detection geometry. The coloured boundaries highlight Transvoxel transition cells. Implementing this feature opened up a lot of bugs in my Transvoxel implementation, allowing me to finally make it water-tight.
+
+As I was working on this, it occurred to me that I will eventually need the ability to allow environment modification/destruction during recording of a movie. Currently what happens is that the latest world data set is used on any scene you record, before or after the modification. In addition to that, while the collision detection is pretty fast, I may want to run some form of simplification pass on the generated polygons.
+
+=== From a Distance ===
+
+The world is made up of sparse voxel octree nodes with voxel bricks at the leaves. These are generated from the world noise function and cached around the camera. Empty nodes are cached with no allocated memory. Any nodes that cover edited voxels bake the noise function in the node cache, serialising it to disk. From that point on, no noise functions are ever run within that node.
+
+Having no noise function to represent an edited voxel brick, lower resolution versions need to be generated for viewing from a distance. During editing, voxel edit ranges are queued and merged, with a separate thread taking care of downsampling while you edit. This gives you the unsettling but "somewhat cool" ability to sculpt areas of the world that are many miles away from you!
+
+Here's a simple shot of this in action:
+
+||{{http://farm9.staticflickr.com/8048/8425183864_30496e86eb.jpg|http://farm9.staticflickr.com/8048/8425183864_30496e86eb_b.jpg}}||
+
+I carved out a 100m^3 block of world which can be seen here as the smallest hole poking through to the horizon. Viewing distance was a couple kilometers. The reduction filter is nearest neighbour, which doesn't give great reproduction of features at a distance. However, the Transvoxel algorithm implicitly requires this and would need extending if I were to try anything better (which I will).
+
+Spawning a few characters, carving out the region around them and quickly flying into and out of your construction from space is really, really awesome. I can't wait to start showing videos of all this but there's more work to be done before I can do that! :)
+
+[disqus][/disqus]

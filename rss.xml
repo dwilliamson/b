@@ -243,5 +243,19 @@ The noise generatio</description>
 <pubDate>Tue, 22 Jan 2013 08:09:43 +0000</pubDate>
 <description>After 3 months of exhaustive Kinect/IK work, I needed a little motivation boost so I tackled two problems: making much bigger worlds with massive draw distances and putting a pretty atmosphere aro</description>
 </item>
+<item>
+<title>Voxel World Sculpting on a Large Scale</title>
+<link>http://donw.org/b/?d=2013-01-29-09-12-13</link>
+<guid>http://donw.org/b/?d=2013-01-29-09-12-13</guid>
+<pubDate>Tue, 29 Jan 2013 09:12:13 +0000</pubDate>
+<description>One of the biggest issues I had to solve early on in the design was how do players add assets to the game world? Should I get a bunch of artists to model varying props and vehicles for different movie types, al</description>
+</item>
+<item>
+<title>Impossible Worlds and Distant Sunsets</title>
+<link>http://donw.org/b/?d=2013-02-10-12-52-45</link>
+<guid>http://donw.org/b/?d=2013-02-10-12-52-45</guid>
+<pubDate>Sun, 10 Feb 2013 12:52:45 +0000</pubDate>
+<description>There is a crazy amount of work that goes on under the hood that doesn't give much visual evidence. I think the biggest work was allowing you to move around the world, smoothly modifying any part of it without a</description>
+</item>
 </channel>
 </rss>

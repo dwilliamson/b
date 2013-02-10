@@ -1,0 +1,29 @@
+<<Impossible Worlds and Distant Sunsets>>
+
+There is a crazy amount of work that goes on under the hood that doesn't give much visual evidence. I think the biggest work was allowing you to move around the world, smoothly modifying any part of it without any hitches and with the smallest amount of latency.
+
+This will be a quick post on my way to describing an even bigger feature that has been in the works for months :)
+
+=== Faster Noise Functions ===
+
+A perfect example was speed of level of detail changes. When I initially demo'd this to a couple of friends, you could fly from space, about 100km in the air, and onto the surface of the planet. Unfortunately, it would take about 2 minutes for the planet to completely update its level of detail to the finest. As a result, I put a lot of work into making this faster.
+
+Eventually, I managed to get 2 minutes down to 5 seconds but the process wasn't without its hiccups:
+
+||{{http://farm9.staticflickr.com/8246/8460455307_434a8f4412_n.jpg|http://farm9.staticflickr.com/8246/8460455307_434a8f4412_b.jpg}} {{http://farm9.staticflickr.com/8365/8460455659_0800c6c331_n.jpg|http://farm9.staticflickr.com/8365/8460455659_0800c6c331_b.jpg}}||
+
+These were the result of some broken attempts to use Simplex Noise to make things faster. The performance gains (losses) ended up being not worth it, however they created some pretty awesome results that I didn't have the imagination to create myself! I think the mountain ranges here were about 20km high, stretching 200km into the distance. Thinking back to when I created these shots, I really should have added a bunch of characters to give some form of size reference.
+
+The result of all this experimentation was better performance and much more flexibility with the amount of noise functions I could run on the data set. Another benefit was the ability to change the entire planet's noise function on-the-fly, seeing it update in almost real-time. This was one variant I played with:
+
+||{{http://farm9.staticflickr.com/8093/8461555668_8b57d0de0c_n.jpg|http://farm9.staticflickr.com/8093/8461555668_8b57d0de0c_b.jpg}}||
+
+I warped the noise domain on each axis to get more eroded, natural looking coast lines and got some pretty neat results. I've yet to settle on the final look of the planet but the flexibility is much appreciated.
+
+Also of note was the sun lighting model which I took some time to refine. Where there should be sunsets on the planet, you get a nice orange glow where the sun light transmits differently through the atmosphere.
+
+=== Further Updates ===
+
+For the next two weeks I'll be on holiday so updates will be delayed. I'm finding it really difficult to sit on the screenshots for subsequent new features but I will try and wait until I get back and give the posts my full attention :)
+
+[disqus][/disqus]
