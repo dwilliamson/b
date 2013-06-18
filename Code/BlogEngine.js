@@ -125,12 +125,14 @@ function BlogEngine()
 				var c = chain[chain_index];
 				c(chain, chain_index + 1);
 			}
-
 		});
 	}	
 
 	this.DisplayPosts = function(div_id, blog_posts, params, post_callback, load_all)
 	{
+		// Clear previous load-on-scroll chain
+		window.onscroll = null;
+
 		// This launches whenever the document is ready to write to
 		DomReady.ready(function()
 		{
@@ -162,7 +164,7 @@ function BlogEngine()
 
 				// Check to see if there is a request in the parameters to display a specific page
 				if (params && "d" in params && document_id.indexOf(params["d"]) != 0)
-					continue;					
+					continue;
 
 				// Add the div for the post first because the AJAX requests for the content will come in out of order
 				var post_div_id = "Post" + document_id.replace(/\-/g, "");
