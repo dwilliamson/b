@@ -4,7 +4,6 @@ I love {Sublime Text 2|http://www.sublimetext.com/2}. For me, it does nearly eve
 
 {This|http://channel9.msdn.com/achievements/visualstudio}. This is nonsense. I can't say any more on the issue because I despair just thinking about it.
 
-
 == My Setup ==
 
 Depsite all that, the Visual Studio debugger is still pretty damned good and very hard to beat. {WinDbg|http://msdn.microsoft.com/en-us/windows/hardware/gg463009} is much more powerful and, at times, more stable, but its interface and learning curve is a little too obtuse for me. I use it mainly as a crash dump inspection tool for post-mortem debugging.
@@ -19,7 +18,6 @@ So I have a typical client/server setup:
 * Server accepts connection and enters the main loop.
 
 The client is a thin client with no real logic or state attached to it. It is directly responsible for launching the server executable and, as such, I needed a means of attaching to the server as soon as it's launched.
-
 
 == A Macro for Attaching to any Process ==
 
@@ -83,7 +81,6 @@ End Sub
 
 Double-clicking on this through the macro explorer will quickly locate the game (or give up if it's not there) and put you in the debugger.
 
-
 == What about Game Startup? ==
 
 After launching the game, it takes a few seconds to focus Visual Studio and double-click on the macro. By this point, all your game initialisation code has happened which probably skips some of the most important code you've written.
@@ -126,7 +123,6 @@ int WINAPI CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR 
 [/code]
 
 This nicely syncs everything up so that I don't miss any breakpoints in my initialisation code.
-
 
 == A Slice of COM Automation to Complete the Puzzle ==
 
@@ -226,6 +222,36 @@ Now I just keep Visual Studio running in the background and my "Wait for Debugge
 * Run client. Visual Studio instantly attaches to Server.
 
 Brilliant!
+
+== A Little Easier ==
+
+Of course after writing all this, it soon became obvious that there were better ways. Here's the C# equivalent:
+
+[code]
+using EnvDTE;
+
+namespace AttachDebugger
+{
+	class Program
+	{
+		static void Main(string[] args)
+		{
+			try
+			{
+				DTE dte = (DTE)System.Runtime.InteropServices.Marshal.GetActiveObject("VisualStudio.DTE.10.0");
+				dte.ExecuteCommand("Macros.StarVSMacros.Debug.AttachToGame");
+			}
+
+			catch (System.Exception e)
+			{
+				System.Windows.Forms.MessageBox.Show("EXCEPTION - Debugger not available: " + e.Message);
+			}
+		}
+	}
+}
+[/code]
+
+This is the version I ended up using. All it needs is a reference to EnvDTE added to your C# project to compile.
 
 Some references:
 
