@@ -1,0 +1,51 @@
+<<A Long Overdue Status Update>>
+
+This blog has been a bit silent of late due to some pretty amazing news we received late last year: we were expecting our first baby! Well, the little bundle of joy has arrived...
+
+||{{http://farm8.staticflickr.com/7414/10962306744_13ecfc06b6.jpg|http://farm8.staticflickr.com/7414/10962306744_13ecfc06b6.jpg}}||
+
+She has changed our lives in nothing but good ways and we figured early on that continuing to live in a pokey basement flat in the heart of Brighton wasn't the best way to start our family. We needed to buy a house!
+
+Back in an earlier post I mentioned my {difficulty in getting a mortgage|2011-12-15-13-02-00}; banks won't touch you unless you're employed. And, yes, you don't even have to be employed for more than a week before they consider you worthy of being in their debt.
+
+== The New Company ==
+
+I decided to form a limited company and do some quick contracting work to bring some money in and get a mortgage. I ended up at {The Creative Assembly/SEGA|http://www.creative-assembly.com/} for 6 months on the {Total War: Rome II|http://www.creative-assembly.com/news/130510/total-war-rome-ii-available-pre-order} graphics team. In a short period, I wrote the landscape blending tech, optimised many parts of the engine and made a bunch more visual improvements. All of which was made to scale on a large sample of different hardware:
+
+||{{http://farm4.staticflickr.com/3713/10962730923_f6cedcc468_n.jpg|http://www.flickr.com/photos/donw/10962730923/}} {{http://farm6.staticflickr.com/5491/10962664494_b2bc67ec5c_n.jpg|http://www.flickr.com/photos/donw/10962664494/}}||
+
+The main part of all that was a hybrid Procedural/Streamed Virtual Texture system that could handle 100s of thousands of active blends with massive draw distances (the Campaign Map really pushed that to its limit). Addressable textures for a landscape would total about 8 terabytes on some maps.
+
+== The House and New Office ==
+
+And we got the house! Unlike last time the entire process went very smoothly, taking around 5 weeks in total. We also lucked out and got a great place in Brighton for a lot less than it was worth - this view from the back is pretty cool:
+
+||{{http://farm4.staticflickr.com/3684/10962942323_f5064124ea_n.jpg|http://farm4.staticflickr.com/3684/10962942323_6262ae3175_o.jpg}}||
+
+The place also had a garage at the back that was converted to a workshop 20 years ago, complete with lots of electricity outlets fed from the main house. Didn't take much convincing for me to turn it into my new office :)
+
+||{{http://farm4.staticflickr.com/3829/10962994024_26d5ccbee1_n.jpg|http://farm4.staticflickr.com/3829/10962994024_d589a75745_o.jpg}}||
+
+But damn, it's VERY cold in there! I have an electric heater but that only does so much - please think of me when working from your warm offices :)
+
+== The Game's New Direction and Platform ==
+
+So taking a step back from the game has made me realise that my direction was a bit muddled up. I've refined that now and will talk about it more in future posts.
+
+More importantly, I've taken one step closer to making the game releasable from within the browser. Long gone is my native implementation hidden within a {JNI-based Java Applet|2012-11-22-13-08-40}. That hideous solution was perfect for me to get up and running and show what the browser could be capable a couple years down the line. However, Oracle is destroying the Java platform and I'd rather not release a game with the stigma of Java surrounding it. Besides, Google are {doing away with plugins|http://blog.chromium.org/2013/09/saying-goodbye-to-our-old-friend-npapi.html} and I want to be ready.
+
+This was one of the happiest days of my life :)
+
+||{{http://farm6.staticflickr.com/5492/10962973655_77de0bcc52_n.jpg|http://farm6.staticflickr.com/5492/10962973655_0c4901f4f6_o.png}}||
+
+The new solution is based heavily on some WebSockets magic, with no browser plugins required:
+
+||
+[lit]
+<iframe width="560" height="315" src="//www.youtube.com/embed/iydr70uJ8YY" frameborder="0" allowfullscreen></iframe>
+[/lit]
+||
+
+I can release very soon as an alpha build and still have enough time for the various web solutions out there to catch up (Empscripten, PNaCl, whatever). I have two blog posts in the works that will detail the new solution so stick around!
+
+[disqus][/disqus]
