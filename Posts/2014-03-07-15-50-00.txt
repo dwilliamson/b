@@ -1,0 +1,239 @@
+
+<<Quick and Dirty JSON Config Files with C++ Reflection>>
+
+Let's say you want JSON config files for your app with the following requirements:
+
+* Have a main config file commit to source control with local user config files can optionally override any settings.
+* Code should parse JSON and populate C++ types so that there's reduced risk of mis-spelling settings names.
+* Config file should be able to store settings for all sub-systems in your app. Each sub-system should be able to load just the settings they're interested in without knowing about the config types for other sub-systems.
+
+{clRefect|https://bitbucket.org/dwilliamson/clreflect} can handle most of this for you. It can trivially parse arbitrary JSON files and populate C++ structures without you having to manage separate IDL files or manually registrer everything. This is clReflect's {equivalent|https://gist.github.com/dwilliamson/3208569} of protobuf's {Quick Example|https://code.google.com/p/protobuf/}:
+
+[code]
+// You write a structure with reflect attribute, like this:
+struct clcpp_attr(reflect) Person
+{
+	int id;
+	std::string name;
+	std::string email;
+};
+ 
+// Modify it like this:
+Person person;
+person.id = 123;
+person.name = "Bob";
+person.email = "bob@example.com";
+ 
+// Save like this:
+clutl::WriteBuffer wb;
+clutl::SaveJSON(wb, &person, clcpp::GetType<Person>(), 0, 0);
+ 
+// Send to file, network, whatever...
+ 
+// Load like this:
+clutl::ReadBuffer rb(wb);
+clutl::LoadJSON(rb, &person, clcpp::GetType<Person>());
+[/code]
+
+My game uses this to transparently handle versionable serialisation of all game objects, except for modifications to the distance field during voxel editing. That uses its own custom ACID-compliant key/value database format that I'll post about at a later point. I'll eventually migrate all game objects to that database where each value is a JSON-serialised bunch of text.
+
+== The Simplest Solution ==
+
+The JSON config file will look similar to this:
+
+[code]
+{
+	"GameConfig":
+	{
+		"ServerTimeoutSecs": 5.2,
+		"LaunchMode": "Developer"
+	},
+	"RenderConfig":
+	{
+		"CreateDebugDevice": false,
+		"WindowTitle": "Title",
+	},
+}
+[/code]
+
+This translates directly into the following C++ structures with required clReflect {markup|https://bitbucket.org/dwilliamson/clreflect/wiki/Marking%20Primitives%20for%20Reflection}:
+
+[code]
+// Possible game launch modes
+enum clcpp_attr(reflect) LaunchModeType
+{
+	Player,
+	QA,
+	Developer,
+	TestBot,
+};
+
+// Game sub-system config with default parameters in constructor
+struct clcpp_attr(reflect) GameConfigDetails
+{
+	GameConfigDetails()
+		: ServerTimeoutSecs(10.0f)
+	{
+	}
+
+	float ServerTimeoutSecs;
+	LaunchModeType LaunchMode;
+};
+
+// Render sub-system config with default parameters in constructor
+struct clcpp_attr(reflect) RenderConfigDetails
+{
+	RenderConfigDetails()
+		: CreateDebugDevice(false)
+		, WindowTitle("My Game")
+	{
+	}
+
+	bool CreateDebugDevice;
+	std::string WindowTitle;
+};
+
+// Collection of configs for all sub-systems
+struct clcpp_attr(reflect) Config
+{
+	GameConfigDetails GameConfig;
+	RenderConfigDetails RenderConfig;
+};
+[/code]
+
+The code for loading all this (with my own code-base types) is:
+
+[code]
+bool LoadJSONObject(const char* filename, void* object, const clcpp::Type* type)
+{
+	core::Assert(object != nullptr);
+	core::Assert(type != nullptr);
+	
+	// Open the source file
+	file::File file(filename.c_str(), "rb");
+	if (!file.IsOpen())
+		return false;
+
+	// Read the entire file into memory
+	u32 file_size = file.Size();
+	clutl::WriteBuffer write_buffer(file_size);
+	void* dest = write_buffer.Alloc(file_size);
+	file.Read(dest, file_size);
+	clutl::ReadBuffer read_buffer(write_buffer);
+
+	// Parse the config file
+	return clutl::LoadJSON(read_buffer, object, type).code == clutl::JSONError::NONE;
+}
+
+// Helper for extracting the type of the object being passed
+template <class TYPE>
+bool LoadJSONObject(const char* filename, TYPE& object)
+{
+	return LoadJSONObject(filename, &object, clcpp::GetType<TYPE>());
+}
+
+// Store the config object somewhere and load it
+Config config;
+bool success = LoadJSONObject("GameConfig.txt", config);
+[/code]
+
+To handle network serialisation of partial object descriptions, clReflect doesn't need all fields of a type to be specified in a JSON file. In order to have user-specified overrides, just load a separate file in a second pass:
+
+[code]
+Config config;
+bool success = LoadJSONObject("GameConfig.txt", config);
+if (success)
+	LoadJSONObject("UserConfig.txt", config);
+[/code]
+
+So you can have a massive settings file checked into your source control that specifies all defaults with much smaller user files that change only the settings they're interested in.
+
+== Reducing System Dependencies ==
+
+The big flaw in this solution is that the Render system needs to know about the Game system settings and vice versa. This requires storing the config types in some shared core library, which is generally undesirable.
+
+When parsing data files (whether they be binary or JSON), if clReflect comes across a field it doesn't know about, it will skip it. For the Render system in particular, this suggests the following solution:
+
+[code]
+// Render sub-system config with default parameters in constructor
+struct clcpp_attr(reflect) RenderConfigDetails
+{
+	RenderConfigDetails()
+		: CreateDebugDevice(false)
+		, WindowTitle("My Game")
+	{
+	}
+
+	bool CreateDebugDevice;
+	std::string WindowTitle;
+};
+
+// Type specific to the Render system that stores only the config it's interested in
+struct clcpp_attr(reflect) RenderConfigHolder
+{
+	RenderConfigDetails RenderConfig;
+};
+
+RenderConfigHolder config;
+bool success = LoadJSONObject("GameConfig.txt", config);
+[/code]
+
+Each system can now independently load only the settings they're interested by following the same pattern.
+
+== Going One Better with Reflection Trickery ==
+
+This works well but it's a bit tedious having to create the containing **RenderConfigHolder** type equivalent for all of your systems. Using the clReflect API we can remove this requirement completely by creating the holder type at runtime whenever we need it:
+
+[code]
+template <class TYPE>
+bool LoadJSONConfigObject(const char* filename, TYPE& object)
+{
+	// Create a field on the stack of the config type being loaded
+	clcpp::Field field;
+	field.type = clcpp::GetType<TYPE>();
+
+	// Give the field the same name as the type
+	field.name = field.type->name;
+
+	// The field is a non-const value object
+	field.qualifier = clcpp::Qualifier(clcpp::Qualifier::VALUE, false);
+
+	// The field byte-offset is zero
+	field.offset = 0;
+
+	// Create a class with only one field
+	clcpp::Class type;
+	type.fields.size = 1;
+
+	// Make a field array with one entry
+	// The CArray class being manipulated here is clReflect's bare-bones array designed for memory-mapped data
+	// structures. As such, we can point it at anything without worrying about it trying to clean anything up.
+	const clcpp::Field* field_ptr = &field;
+	type.fields.data = &field_ptr;
+
+	// As the POD type created has only field, we can safely alias it with the field object
+	return file::LoadJSONObject(filename, &object, &type);
+}
+[/code]
+
+Finally, the config loading code for a specific system is reduced to:
+
+[code]
+// Render sub-system config with default parameters in constructor
+struct clcpp_attr(reflect) RenderConfig
+{
+	RenderConfig()
+		: CreateDebugDevice(false)
+		, WindowTitle("My Game")
+	{
+	}
+
+	bool CreateDebugDevice;
+	std::string WindowTitle;
+};
+
+RenderConfig config;
+bool success = LoadJSONConfigObject("GameConfig.txt", config);
+[/code]
+
+[disqus][/disqus]

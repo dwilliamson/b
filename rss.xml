@@ -266,5 +266,14 @@ The noise generatio</description>
 
 ||{{http://farm8.staticflickr.com/741</description>
 </item>
+<item>
+<title>Quick and Dirty JSON Config Files with C++ Reflection</title>
+<link>http://donw.org/b/?d=2014-03-07-15-50-00</link>
+<guid>http://donw.org/b/?d=2014-03-07-15-50-00</guid>
+<pubDate>Fri, 07 Mar 2014 15:50:00 +0000</pubDate>
+<description>Let's say you want JSON config files for your app with the following requirements:
+
+* Have a main config file commit to source control with local user config files can optionally override any</description>
+</item>
 </channel>
 </rss>
