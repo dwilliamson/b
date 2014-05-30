@@ -1,0 +1,40 @@
+
+<<Stable Painterly Rendering for Fable Heroes>>
+
+{Fable Heroes|http://marketplace.xbox.com/en-gb/Product/Fable-Heroes/66acd000-77fe-1000-9115-d80258410b86} was created as the result of {our|https://www.youtube.com/watch?v=SkK54N2WKQI&t=0m15s} Lionhead Creative Day collaboration. I can't recall how long we worked on it (it was longer than the given 2 days) a lot of it was done in the evenings after work, while we were squashing final bugs on Fable 3. Luckily Microsoft decided to turn it into a game people could buy, so after bringing on a whole load more talented Lionhead devs the game saw the light of day.
+
+I worked mostly with {Jon Eckersley|https://twitter.com/EcksAndWhy} defining the cartoon look of the game, modifying the Fable engine in lots of crazy ways to figure out what looked best. During that time we went through many different rendering techniques, including one I managed to make a video of:
+
+||[lit]<iframe width="560" height="315" src="//www.youtube.com/embed/kbgZHUGa510" frameborder="0" allowfullscreen></iframe>[/lit]||
+
+It's relatively simple to take an image and render it painterly-style; applying coloured brush strokes wherever it looks good. Making it stable between frames is more difficult and most approaches suffer from a {screen-door effect|http://en.wikipedia.org/wiki/Screen-door_effect} that can cause discomfort to the viewer. The requirements for this Fable Heroes effect were:
+
+* It had to be temporally stable.
+* Brush strokes had to render outside the silhouette of objects.
+* Works for particles and allows whatever depths/transparencies were interacting in a scene (e.g. vegetation, windows, water).
+* Needed to be fast and run between 1-2ms a frame.
+
+Naturally, screen-space effects can solve most of that but making it temporally stable is tough given the limits of the hardware. I made a few attempts and solving this but it was getting complicated very fast for very little return. A world-space solution was required.
+
+I ended up with this:
+
+* At load-time a set of particles with position/basis were uniformly distributed on the surface of all meshes. A particle basis was derived from the tangent frame with a random z-rotation.
+* The engine renders its entire frame with textures, lighting and transparency as it would do normally.
+* The frame is resolved to a texture and down-sampled for later use.
+* As objects became visible, they got added to groups of clustered particles.
+* These particles were sorted by distance to the camera using a GPU odd-even merge sort. As the sort was stable it could be distributed over multiple frames.
+* This particle list was fetched directly from a vertex shader that generated quad vertices oriented to the surface of whatever object they were attached to (with the random rotation).
+* Artist-defined, grey-scale brush textures were then applied to the quads, taking on the colour of the down-sampled texture created earlier in the frame.
+
+The down-sampled frame buffer provided two benefits:
+
+* A performance increase due to minimal texture cache thrashing.
+* A reduction in distracting high frequency colour changes as particles took on the colour beneath them.
+
+A key tool in making this performant was the odd-even merge sort. A faster way to sort on the GPU would be to use the {bitonic merge sort|http://http.developer.nvidia.com/GPUGems2/gpugems2_chapter46.html}, however this removes the ability to sort over multiple frames.
+
+A massive improvement not shown in the video was artist-edited brush stroke directions. One of the advancements from Fable 2->3 was the use of texture lightmaps over vertex lightmaps. I wrote a surface parameterisation tool that generated unique UVs by using the initial artist UVs as input. In terms of stability and speed it hands-down beat LSCM or similar techniques (in some cases being over 100x times faster). This allowed us to assign unique texture maps to every object in the world fairly trivially.
+
+Late on I added a tool that calculated flow from brush strokes painted onto an object, allowing artists to define the direction of the particles per object. At that point the Unreal bomb hit, preventing me from allowing the artists to take advantage of it. However, it certainly showed that there is still a whole lot of amazing paths we can take with realtime painterly rendering!
+
+[disqus][/disqus]
