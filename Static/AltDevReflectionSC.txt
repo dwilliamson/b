@@ -1073,3 +1073,5 @@ This method of tools development was really quite natural: you could iterate ama
 The methods contained within are among those that you should keep in your bag of tricks and bring out when you need good, scalable solutions quickly. If you're into the new-fangled idea of developing your tools in a web browser, these techniques will get you most of the way there and even allow you to write native browser games without having to write plugins!
 
 If you're meta-programming hungry, part 3 will cover some more elaborate reflection technology which I wouldn't necessarily recommend these days. It will hopefully serve as a lesson in how things can get complicated very fast. Stay tuned, as the internals of a basic IDL compiler will also be covered.
+
+[disqus][/disqus]

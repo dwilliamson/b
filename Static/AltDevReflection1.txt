@@ -1008,3 +1008,5 @@ To give you an sampling of how diverse the implementations can be, I've collecte
 * {Class Reflection in the Despair Engine|http://gameangst.com/?p=107} - Uses template-based registration with an attempted DSL-in-C++ approach.
 
 This is a bit of a big post and I'd like to thank everybody who's reviewed it for me. Special mentions go to Stephen Hill who made several tireless passes and Patrick Duquette, who cleared the road at Ubisoft for me to talk about the SC5 stuff.
+
+[disqus][/disqus]
