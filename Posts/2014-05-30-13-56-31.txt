@@ -1,7 +1,7 @@
 
 <<Stable Painterly Rendering for Fable Heroes>>
 
-{Fable Heroes|http://marketplace.xbox.com/en-gb/Product/Fable-Heroes/66acd000-77fe-1000-9115-d80258410b86} was created as the result of {our|https://www.youtube.com/watch?v=SkK54N2WKQI&t=0m15s} Lionhead Creative Day collaboration. I can't recall how long we worked on it (it was longer than the given 2 days) a lot of it was done in the evenings after work, while we were squashing final bugs on Fable 3. Luckily Microsoft decided to turn it into a game people could buy, so after bringing on a whole load more talented Lionhead devs the game saw the light of day.
+{Fable Heroes|http://marketplace.xbox.com/en-gb/Product/Fable-Heroes/66acd000-77fe-1000-9115-d80258410b86} was created as the result of our Lionhead Creative Day collaboration. I can't recall how long we worked on it (it was longer than the given 2 days) a lot of it was done in the evenings after work, while we were squashing final bugs on Fable 3. Luckily Microsoft decided to turn it into a game people could buy, so after bringing on a whole load more talented Lionhead devs the game saw the light of day.
 
 I worked mostly with {Jon Eckersley|https://twitter.com/EcksAndWhy} defining the cartoon look of the game, modifying the Fable engine in lots of crazy ways to figure out what looked best. During that time we went through many different rendering techniques, including one I managed to make a video of:
 
