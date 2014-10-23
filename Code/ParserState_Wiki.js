@@ -22,6 +22,7 @@ function ParserState_Wiki(parser)
 	url_pattern = /^{[^\|]*\|[^}]*}/;
 	img_pattern = /^{{[^}]*}}/;
 	title_pattern = /^\<<[^>]*>>/;
+	code_span_pattern = /^##[^#]*##/;
 	table_open_pattern = /^\n\s*\*/;
 	table_item_pattern = /^\n\s*\*/;
 	table_close_pattern = /^\n/;
@@ -96,6 +97,12 @@ function ParserState_Wiki(parser)
 			images = url[0].slice(2, -2).split("|");
 			url = images[1];
 
+			if (url == "")
+			{
+				this.parser.add_html('<img src="' + images[0] + '"></a>');
+				return;
+			}
+
 			var is_url_link = url.indexOf("url:") == 0;
 			if (is_url_link)
 				url = url.replace("url:", "");
@@ -134,6 +141,12 @@ function ParserState_Wiki(parser)
 			// Static pages don't have valid dates
 			if (this.parser.date != null)
 				this.parser.add_html('<span class="date">Posted ' + this.parser.date.toLocaleString() + '</span>');
+		}
+
+		else if (code_span = this.parser.match(code_span_pattern, "#"))
+		{
+			var text = code_span[0].slice(2, -2);
+			this.parser.add_html("<span class='code-span'>" + text + "</span>");
 		}
 
 		else if (!this.table && this.parser.match(table_open_pattern, "\n"))
