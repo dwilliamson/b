@@ -1,0 +1,517 @@
+<<Hacking MSVC RTTI: Dynamic Type Discovery with clRefect>>
+
+In this post I'll discuss various **GetType** implementations for {clReflect|clReflect}, highlighting why I don't believe any solution should be a part of the core API. The challenge is easily demonstrated:
+
+[code]
+T* object = ...;
+const clcpp::Type* object_type = GetType(object);
+[/code]
+
+What we're looking for is a replacement for the C++ {typeid operator|http://en.cppreference.com/w/cpp/language/typeid} that returns a valid clReflect {clcpp::Type|https://bitbucket.org/dwilliamson/clreflect/src/01726f06b2cffaa3e9eaa5fcc5b9eeef747670f5/inc/clcpp/clcpp.h?at=default#cl-633} object.
+
+=== Base Classes with Factories (Intrusive) ===
+
+The simplest of solutions is to store a **clcpp::Type** pointer in a base class that all objects should derive from, using a factory to create them:
+
+[code]
+// Base class with type pointer
+struct Object
+{
+	const clcpp::Type* type;
+};
+
+// Typical example of a derived object
+struct GameObject : public Object
+{
+};
+
+struct Factory
+{
+	template <typename TYPE>
+	TYPE* Create()
+	{
+		// Type is known at compile-time so 'new' the object and assign its type
+		TYPE* object = new TYPE;
+		object->type = clcpp::GetType<TYPE>();
+		return object;
+	}	
+};
+[/code]
+
+Of course requiring that the type be known at compile-time is fairly limiting, preventing you from creating objects of a type known at runtime (e.g. for serialisation). This can be solved easily enough by extending **Factory** to lookup type names in the {Reflection Database|https://bitbucket.org/dwilliamson/clreflect/src/01726f06b2cffaa3e9eaa5fcc5b9eeef747670f5/inc/clcpp/clcpp.h?at=default#cl-853}:
+
+[code]
+struct Factory
+{
+	Object* Create(const char* type_name)
+	{
+		// Use the type name hash to see if the type exists in the database 
+		uint32_t name_hash = clcpp::internal::HashNameString(type_name);
+		const clcpp::Type* type = m_DB->GetType(name_hash);
+
+		// As the type must be derived from Object, ensure type is a class
+		const clcpp::Class* class_type = type->AsClass();
+
+		// Allocate enough space to store the object
+		void* object_data = malloc(type->size);
+
+		// Call the default constructor associated with the type
+		typedef void (*Constructor)(void*);
+		Constructor constructor = (Constructor)class_type->constructor->address;
+		constructor(object);
+
+		// Cast to Object and assign the type
+		Object* object = (Object*)object_data;
+		object->type = type;
+
+		return object;
+	}
+
+	const clcpp::Database* m_DB;
+};
+[/code]
+
+This --kind of-- works really well but has one subtle flaw involving the cast to **Object** above. Take this type:
+
+[code]
+struct GameObject : public Object
+{
+	virtual void Hello(); 
+};
+[/code]
+
+While **sizeof(Object)** is 4 the same can not be said of **GameObject**, which is 8. The layout of the two objects is:
+
+[code]
+   Object (size=4)
+   ------
+0: type
+
+   GameObject (size=8)
+   ----------
+0: vfptr
+4: type
+[/code]
+
+The virtual table pointer shifts the type pointer to a different location and casting to **Object** will incorrectly overwrite the virtual table pointer. A solution exhibited in the clReflectUtil {Object API|https://bitbucket.org/dwilliamson/clreflect/src/01726f06b2cffaa3e9eaa5fcc5b9eeef747670f5/inc/clutl/Objects.h?at=default#cl-36} is to add a virtual table to the base object:
+
+[code]
+struct Object
+{
+	virtual ~Object() { }
+	const clcpp::Type* type;
+}
+[/code]
+
+This is not a cast-iron scalable solution (multiple inheritance changes everything) so I've kept it out of the core API and pushed it into the utilities library. It is (or was) good enough for my own needs.
+
+{Issue #16|https://bitbucket.org/dwilliamson/clreflect/issue/16/merge-class-properties-from-bases} specifies an improvement that would allow clReflect to side-step this issue by looking up the location of the type pointer using the Reflection API itself. Unfortunately, as clReflect currently stores field members that were declared in the type and not inherited, it has to inspect the base class to get the **type** pointer field address. This is calculated as a field offset within **Object**, use of which would also overwrite the virtual table pointer.
+
+=== Base Classes without Factories (Intrusive) ===
+
+Let's face it, factories are a pain:
+
+* Forwarding arguments is non-trivial. While C++11 allows perfect forwarding, simplifying the situation a little, I'm not comfortable shipping an API that *requires* C++11. Not to mention it's useless when you need to forward arguments at runtime.
+* The natural reflex of a C++ programmer when creating an object is to 'new' it, referencing the constructor to pass the required parameters. Any deviation from that is just extra context that needs to be committed to memory when working with an API. When multiple APIs are involved, it's a mess.
+
+The experimental {Object 2 API|https://bitbucket.org/dwilliamson/clreflect/src/01726f06b2cffaa3e9eaa5fcc5b9eeef747670f5/inc/clutl/Objects.h?at=default#cl-84} within clReflectUtil requires manual application of the type pointer within derived types:
+
+[code]
+struct Object
+{
+	template <typename TYPE>
+	void SetType(const TYPE* this_ptr)
+	{
+		type = clcpp::GetType<TYPE>();
+	}
+
+	const clcpp::Type* type;
+};
+
+struct MyObject : public Object
+{
+	MyObject()
+	{
+		SetType(this);
+	}
+};
+[/code]
+
+This happily solves the virtual function table problem. Having to do this kind of manual setup is a little tedious and can be easy to forget. However, it exposes a clean API to client, allowing them to use new/delete as they see fit without worrying about your use of reflection.
+
+Runtime object creation can also be simplified to:
+
+[code]
+void* Create(const char* type_name)
+{
+	// Use the type name hash to see if the type exists in the database 
+	uint32_t name_hash = clcpp::internal::HashNameString(type_name);
+	const clcpp::Type* type = m_DB->GetType(name_hash);
+
+	// Allocate enough space to store the object
+	void* object_data = malloc(type->size);
+
+	// Call the default constructor associated with the type
+	const clcpp::Class* class_type = type->AsClass();
+	typedef void (*Constructor)(void*);
+	Constructor constructor = (Constructor)class_type->constructor->address;
+	constructor(object);
+
+	return object;
+}
+[/code]
+
+Note that any serious implementation of **Create** above would take the type hash as a parameter and not perform the hash on each call.
+
+It's also worth mentioning that discovering an object's type in this manner is **constant time**.
+
+=== Runtime Lookup with C++98 RTTI (Non-intrusive) ===
+
+When you have an established code-base, retrofitting any of the above methods is likely not what you want to do (and in a lot of cases it may not be possible). There are a few non-intrusive methods available, with a family of them based around taking advantage of the existing C++ RTTI mechanism.
+
+The main idea is that whenever a caller needs the type of an object, you invoke **typeid** to return a {std::type_info|http://www.cplusplus.com/reference/typeinfo/type_info/} object that can then be mapped to its equivalent clReflect type. Using C++98 this looks like:
+
+[code]
+typedef std::map<uint32_t, const clcpp::Type*> TypeMap;
+TypeMap g_TypeMap;
+
+template <class TYPE>
+const clcpp::Type* GetRuntimeType(const TYPE* ptr)
+{
+	// Use the hash code of the C++ type name to lookup the clReflect type
+	const char* type_name = typeid(*ptr).name();
+	uint32_t type_hash = clcpp::internal::HashNameString(type_name);
+	return g_TypeMap[type_hash];
+}
+[/code]
+
+The requirements for this to work are:
+
+* If the static implementation type is not available at the point of call then the object must carry a virtual function table so that **typeid** can lookup the **type_info** object.
+* If the static implementation type is used to invoked **GetRuntimeType** then no virtual function table needs to be present.
+* A registration process needs to initially map from C++ type name to its clReflect type.
+
+Registration is another problem that can be solved multiple ways:
+
+* Perform registration on-demand if a type doesn't exist in the type map yet.
+* Add a static variable for each of your type implementations that adds to the map on startup.
+* Use code generation to generate a list of registration statements.
+
+I prefer the first method as it's relatively self-contained and quite simple to implement as a plugin. It can look like this:
+
+[code]
+const clcpp::Database* g_DB;
+
+const char* GetRTTIClassName(const char* class_name)
+{
+	// MSVC-specific: skip 'class'/'struct' keyword
+	// Not a complete implementation as types may be more complex than this
+	if (*class_name == 'c')
+		return class_name + 6;
+	if (*class_name == 's')
+		return class_name + 7;
+	return class_name;
+}
+
+template <class TYPE>
+const clcpp::Type* GetRuntimeType(const TYPE* ptr)
+{
+	// Use hash code of the C++ type name to see if a clReflect type is mapped for it
+	const char* rtti_type_name = typeid(*ptr).name();
+	uint32_t rtti_type_hash = clcpp::internal::HashNameString(rtti_type_name);
+	TypeMap::iterator i = g_TypeMap.find(rtti_type_hash);
+	if (i != g_TypeMap.end())
+		return i->second;
+
+	// Decode the RTTI class name and use its hash to check the clReflect database
+	const char* class_name = GetRTTIClassName(rtti_type_name);
+	uint32_t class_hash = clcpp::internal::HashNameString(class_name);
+	const clcpp::Type* type = g_DB->GetType(class_hash);
+	if (type == nullptr)
+		return nullptr;
+
+	// Add for later lookup
+	g_TypeMap[rtti_type_hash] = type;
+	return type;
+}
+[/code]
+
+The first time this function is called on an object it requires two hash calculations and two table lookups (clReflect uses a binary search on a contiguous array of data). Subsequent calls require only one hash calculation and one map lookup, similar to the original.
+
+=== Runtime Lookup with C++11 RTTI (Non-intrusive) ===
+
+C++11 adds the {std::type_index|http://www.cplusplus.com/reference/typeindex/type_index/} type to allow references to a **typeid** object to be stored, hashed and copied around. Each object also carries a hash code returnable by {type_info::hash_code|http://www.cplusplus.com/reference/typeinfo/type_info/hash_code/}. This simplifies the implementation of runtime lookup while potentially making it more efficient:
+
+[code]
+clcpp::Database* g_DB;
+
+typedef std::unordered_map<std::type_index, const clcpp::Type*> TypeMap;
+TypeMap g_TypeMap;
+
+template <class TYPE>
+const clcpp::Type* GetRuntimeType(const TYPE* ptr)
+{
+	// See if the clReflect type has been mapped
+	auto i = g_TypeMap.find(typeid(*ptr));
+	if (i != g_TypeMap.end())
+		return i->second;
+
+	// Decode the RTTI class name and use its hash to check the clReflect database
+	const char* class_name = GetRTTIClassName(rtti_type_name);
+	uint32_t class_hash = clcpp::internal::HashNameString(class_name);
+	const clcpp::Type* type = g_DB->GetType(class_hash);
+	if (type == nullptr)
+		return nullptr;
+
+	// Add for later lookup
+	g_TypeMap[typeid(*ptr)] = type;
+	return type;
+}
+[/code]
+
+It looks like **type_index** was added for situations such as this. The control flow pans out like:
+
+* **typeid** returns a reference to a **type_info** object.
+* This gets converted to a **type_index** object.
+* When doing a find in the map, {std::hash|http://www.cplusplus.com/reference/typeindex/type_index/hash/} is called which returns the value from **type_info::hash_code**.
+
+While this can remove the need to hash the type name on each call, the implementation of **type_info** in MSVC 2010 performs a very basic pseudo-random transform on each call. This is a shame as this could have been calculated by the compiler and stored for retrieval at runtime.
+
+=== Hacking MSVC RTTI (Non-intrusive) ===
+
+Is it possible to remove the cost of map lookup and make type discovery non-intrusive **and** constant-time? Well, yes... it is. But it uses undocumented data structures specific to MSVC. While these are subject to change over the lifetime of Microsoft's compiler, they are highlighy unlikely to change due to the desire of Microsoft to keep ABI compatibility between their products.
+
+This is not to say that the following method will work everywhere :) However, it is Microsoft specific and I expect that other platforms will have similar details that can be reverse-engineered.
+
+RTTI is implemented on MSVC by placing a type info pointer before the pointer list in the virtual function table:
+
+||[lit]<img src="Images/MSVCVFTable.png">[/lit]||
+
+This is a low-cost way of adding RTTI to existing objects while seamlessly interacting with an ABI that doesn't need to know that RTTI exists. {Geoff Chappell|http://www.geoffchappell.com/index.htm} unsurprisingly documents the layout of the RTTI info {here|http://www.geoffchappell.com/studies/msvc/language/predefined/}.
+
+Getting from a pointer to its type info can be done with the following code:
+
+[code]
+// Reverse-engineered/undocumented types from Geoff's site
+
+#pragma warning (disable:4200)
+struct TypeDescriptor
+{
+	unsigned long hash;	 // Type name hash
+	void* spare;			// Unused?
+	char name[0];			// Variable-size name after object
+};
+#pragma warning (default:4200)
+
+struct PMD
+{
+	int mdisp;	// vftable offset
+	int pdisp;	// vbtable offset
+	int vdisp;	// vftable offset for virtual base class
+};
+
+struct RTTIBaseClassDescriptor
+{
+	TypeDescriptor* pTypeDescriptor;
+	DWORD numContainedBases;
+	PMD where;
+	DWORD attributes;
+};
+
+#pragma warning (disable:4200)
+struct RTTIBaseClassArray
+{
+	// Includes the referencing class as its first entry
+	RTTIBaseClassDescriptor *arrayOfBaseClassDescriptors [lit][][/lit];
+};
+#pragma warning (default:4200)
+
+struct RTTIClassHierarchyDescriptor
+{
+	DWORD signature;	// Unused?
+	DWORD attributes;	// bit 0: multiple inheritance, bit 1: virtual inheritance
+	DWORD numBaseClasses;	// at least 1 (all base classes, including itself)
+	RTTIBaseClassArray* pBaseClassArray;
+};
+
+struct RTTICompleteObjectLocator
+{
+	DWORD signature;	 // Unused?
+	DWORD offset;		// vftable offset to this
+	DWORD cdOffset;
+	TypeDescriptor* pTypeDescriptor;
+	RTTIClassHierarchyDescriptor* pClassDescriptor;
+};
+
+RTTICompleteObjectLocator* TypeInfo(const void* ptr)
+{
+	// Negative pointer-size indexing of vtable to get RTTI type
+	void** vptr = *(void***)ptr;
+	return *(RTTICompleteObjectLocator**)(vptr - 1);
+}
+[/code]
+
+The **TypeDecriptor** type above is actually MSVC's **std::type_info** with an incorrectly named **hash** field. This field is a pointer to the virtual table for **std::type_info**.
+
+The first task has two goals:
+
+* Replace the **pTypeDescriptor** pointer in **RTTICompleteObjectLocator** with a new object that allows us to map back to the equivalent clReflect type at runtime.
+* Replace the pointer in such a way that allows easy detection of whether the type has been redirected or not.
+
+Here's one way of achieving this:
+
+[code]
+struct RTTIRedirect
+{
+	// Map to equivalent clReflect type
+	const clcpp::Type* type;
+
+	// Pointer to next field to allow runtime detection of
+	// whether RTTI has been redirected for this type
+	TypeDescriptor* type_descriptor_ptr;
+
+	// Copy of original type descriptor with trailing name
+	TypeDescriptor type_descriptor;
+};
+
+void RedirectRTTIType(RTTICompleteObjectLocator* loc, const clcpp::Type* type)
+{
+	// Point to the type name
+	const char* name_ptr = loc->pTypeDescriptor->name;
+	uint32_t name_len = strlen(name_ptr) + 1;
+
+	// Create a redirection object
+	// Memory for this object will be cleaned up on program exit
+	RTTIRedirect* rd = (RTTIRedirect*)malloc(sizeof(RTTIRedirect) + name_len);
+	rd->type = type;
+	rd->type_descriptor_ptr = &rd->type_descriptor;
+	rd->type_descriptor = *loc->pTypeDescriptor;
+
+	// Copy the name over, including the null terminator
+	memcpy((char*)&rd->type_descriptor + sizeof(TypeDescriptor), name_ptr, name_len);
+
+	// Remove write-protection from the region around the object locator
+	MEMORY_BASIC_INFORMATION mem;
+	VirtualQuery(loc, &mem, sizeof(mem));
+	DWORD old_protect;
+	VirtualProtect(mem.BaseAddress, mem.RegionSize, PAGE_READWRITE, &old_protect);
+
+	// Replace existing type descriptor
+	loc->pTypeDescriptor = (TypeDescriptor*)rd->type_descriptor_ptr;
+
+	// Restore write-protection
+	VirtualProtect(mem.BaseAddress, mem.RegionSize, old_protect, &old_protect);
+}
+
+RTTIRedirect* GetRTTIRedirect(RTTICompleteObjectLocator* loc)
+{
+	// TypeDescriptor is embedded as a field in RTTIRedirect so skip
+	// back to the beginning
+	TypeDescriptor* td = loc->pTypeDescriptor;
+	return (RTTIRedirect*)((char*)td - offsetof(RTTIRedirect, type_descriptor));
+}
+
+bool HasRTTITypeBeenRedirected(RTTICompleteObjectLocator* loc)
+{
+	// Just need to verify that the RTTIRedirect type descriptor pointer is valid
+	RTTIRedirect* rd = GetRTTIRedirect(loc);
+	return rd->type_descriptor_ptr == &rd->type_descriptor;
+}
+[/code]
+
+The next task relates to the type name. A typical MSVC type name looks like **.?AVDerived@Inner@Outer@@** (actual type name **Outer::Inner::Derived**). If you want to look this type up in the clReflect database then it needs to be decoded:
+
+[code]
+std::string GetClassName(const char* symbol_name)
+{
+	const char* c = symbol_name;
+
+	// Ensure this is a class/struct name
+	if (*c++ != '.')
+		return "";
+	if (*c++ != '?')
+		return "";
+	if (*c++ != 'A')
+		return "";
+	char type = *c++;
+	if (type != 'U' && type != 'V')
+		return "";
+
+	// Parse the symbol name
+	std::string class_name, local_name;
+	const char* end = symbol_name + strlen(symbol_name);
+	while (c < end)
+	{
+		// Namespace separator?
+		if (*c == '@')
+		{
+			// End of symbol name?
+			if (++c < end && *c == '@')
+				break;
+
+			// Prefix local name and clear ready for the next part
+			class_name = "::" + local_name + class_name;
+			local_name.clear();
+			continue;
+		}
+
+		local_name += *c++;
+	}
+
+	// Prefix last encountered local name
+	return local_name + class_name;
+}
+[/code]
+
+This is a basic example decode function that will work on a large majority of type names but will likely fail a on few edge cases. With that, we can finally write our constant-time implementation:
+
+[code]
+clcpp::Database* g_DB;
+
+const clcpp::Type* GetRuntimeType(const void* ptr)
+{
+	// Get the RTTI type and see if it's been redirected yet
+	RTTICompleteObjectLocator* loc = TypeInfo(ptr);
+	if (!HasRTTITypeBeenRedirected(loc))
+	{
+		// Undecorate the type name and use its hash to lookup the clReflect type
+		std::string class_name = GetClassName(loc->pTypeDescriptor->name);
+		uint32_t type_hash = clcpp::internal::HashNameString(class_name.c_str());
+		const clcpp::Type* type = g_DB->GetType(type_hash);
+		if (type == nullptr)
+			return nullptr;
+
+		// Redirect for future lookup
+		RedirectRTTIType(loc, type);
+	}
+
+	// Constant-time lookup!
+	RTTIRedirect* rd = GetRTTIRedirect(loc);
+	return rd->type;
+}
+[/code]
+
+=== clReflect as a Compiler Extension ===
+
+clReflect works by using {clang|http://clang.llvm.org/} to pre-process your source code. A quick drop-in build solution is to just run it on all of your files, effectively compiling them twice. For large systems this will become prohibitive so it helps to identify a set of files that contain only the types you want to reflect (similar to an IDL solution).
+
+However, clReflect **could** be written as an extension to clang, requiring just one compile of your source files to give you reflection everywhere. Doing so would also allow you to modify the existing C++ RTTI system on all platforms in a safe and deterministic manner. I guess the simplest of solutions would be to store an extra pointer before the RTTI pointer in the vftable, thus keeping whatever platform ABI is in place.
+
+This is just one example among many of the benefits a compiler extension would bring!
+
+=== Conclusion ===
+
+I can think of many more ways to solve this problem, each of which works for some teams and fails for others. For this reason, retrieving the type of an object at runtime will never become a part of the clReflect core API. I want to keep the API as simple and clean as possible with minimal surprises as to how stuff works.
+
+I also currently think clReflect attempts to do too much in the core API. For example, {clcpp::GetType|https://bitbucket.org/dwilliamson/clreflect/src/01726f06b2cffaa3e9eaa5fcc5b9eeef747670f5/inc/clcpp/clcpp.h?at=default#cl-909} has gone through several different implementations over the life-time of clReflect where the current version requires code-generation to work. I will eventually push this into the utility libraries.
+
+The final goal is to have the core API surrounded by a list of optional plugins that each have their own dependencies.
+
+=== References ===
+
+* {Predefined C++ Types|http://www.geoffchappell.com/studies/msvc/language/predefined/}
+* {Reversing Microsoft Visual C++ Part II: Classes, Methods and RTTI|http://www.openrce.org/articles/full_view/23}
+* {Visual C++ RTTI Inspection|http://blog.quarkslab.com/visual-c-rtti-inspection.html}
+* {C++ Name Mangling/Demangling|http://www.kegel.com/mangle.html}
+
+[disqus][/disqus]

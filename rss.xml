@@ -9,8 +9,10 @@
 <link>http://donw.org/b/?d=2011-06-06-20-20-57</link>
 <guid>http://donw.org/b/?d=2011-06-06-20-20-57</guid>
 <pubDate>Mon, 06 Jun 2011 20:20:57 +0100</pubDate>
-<description>Welcome to my blog :)
-
+<description>Welcome to my blog :)
+
+
+
 In the next couple of weeks I'll be starting my own business in Brighton and couldn't be more excited about it! At the moment, I'm taking a little holiday so my days consist of catching up on sleep, cooking, gardening</description>
 </item>
 <item>
@@ -32,8 +34,10 @@ In the next couple of weeks I'll be starting my own business in Brighton and cou
 <link>http://donw.org/b/?d=2011-06-28-17-04-00</link>
 <guid>http://donw.org/b/?d=2011-06-28-17-04-00</guid>
 <pubDate>Tue, 28 Jun 2011 17:04:00 +0100</pubDate>
-<description>UPDATE: The source code to PiB is {now available|PiB}.
-
+<description>UPDATE: The source code to PiB is {now available|PiB}.
+
+
+
 I've been setup in the new office now for a good 5 days and there have been bits of progress made here and there. Monday last week involved me building my new desk, cleaning </description>
 </item>
 <item>
@@ -41,8 +45,10 @@ I've been setup in the new office now for a good 5 days and there have been bits
 <link>http://donw.org/b/?d=2011-07-12-16-58-49</link>
 <guid>http://donw.org/b/?d=2011-07-12-16-58-49</guid>
 <pubDate>Tue, 12 Jul 2011 16:58:49 +0100</pubDate>
-<description>Just thought I'd record a quick bit of code that's come in handy just now. Maybe when I get used to this blog thing I'll do this more frequently!
-
+<description>Just thought I'd record a quick bit of code that's come in handy just now. Maybe when I get used to this blog thing I'll do this more frequently!
+
+
+
 I was writing a 64-bit itoa and needed to figure out how many bytes a</description>
 </item>
 <item>
@@ -57,7 +63,8 @@ I was writing a 64-bit itoa and needed to figure out how many bytes a</descripti
 <link>http://donw.org/b/?d=2011-08-16-17-27-23</link>
 <guid>http://donw.org/b/?d=2011-08-16-17-27-23</guid>
 <pubDate>Tue, 16 Aug 2011 17:27:23 +0100</pubDate>
-<description>My blog has been a bit quiet for a while and I assure you that it will become apparent why within the week :) I'm hoping to also share a few words on what it feels like to be self-employed for a couple of months now.</description>
+<description>My blog has been a bit quiet for a while and I assure you that it will become apparent why within the week :) I'm hoping to also share a few words on what it feels like to be self-employed for a couple of months now.
+</description>
 </item>
 <item>
 <title>Introducing clReflect - C++ Reflection with clang</title>
@@ -71,8 +78,10 @@ I was writing a 64-bit itoa and needed to figure out how many bytes a</descripti
 <link>http://donw.org/b/?d=2011-09-08-21-41-00</link>
 <guid>http://donw.org/b/?d=2011-09-08-21-41-00</guid>
 <pubDate>Thu, 08 Sep 2011 21:41:00 +0100</pubDate>
-<description>So I'm at the 3 month mark of being self-employed and everything is going good. It's about time I broke the trend of technical posts and covered some real life news.
-
+<description>So I'm at the 3 month mark of being self-employed and everything is going good. It's about time I broke the trend of technical posts and covered some real life news.
+
+
+
 As far as project progress is concerned, I'm not whe</description>
 </item>
 <item>
@@ -108,8 +117,10 @@ As far as project progress is concerned, I'm not whe</description>
 <link>http://donw.org/b/?d=2012-03-08-13-00-00</link>
 <guid>http://donw.org/b/?d=2012-03-08-13-00-00</guid>
 <pubDate>Thu, 08 Mar 2012 13:00:00 +0000</pubDate>
-<description>As my little game project builds steam and I become more confident that it will actually work, it's becoming easier for me to talk about the various problems I've had to tackle.
-
+<description>As my little game project builds steam and I become more confident that it will actually work, it's becoming easier for me to talk about the various problems I've had to tackle.
+
+
+
 A little backg</description>
 </item>
 <item>
@@ -138,8 +149,10 @@ A little backg</description>
 <link>http://donw.org/b/?d=2012-07-27-12-42-30</link>
 <guid>http://donw.org/b/?d=2012-07-27-12-42-30</guid>
 <pubDate>Fri, 27 Jul 2012 12:42:30 +0100</pubDate>
-<description>I'm stuck on quite a major feature and only have a few hours of time available to work today so I thought I'd take a break and work on something that has been confusing me for a while, now.
-
+<description>I'm stuck on quite a major feature and only have a few hours of time available to work today so I thought I'd take a break and work on something that has been confusing me for a while, now.
+
+
+
 I use {TinyBlog|T</description>
 </item>
 <item>
@@ -175,8 +188,10 @@ I use {TinyBlog|T</description>
 <link>http://donw.org/b/?d=2012-11-22-13-08-40</link>
 <guid>http://donw.org/b/?d=2012-11-22-13-08-40</guid>
 <pubDate>Thu, 22 Nov 2012 13:08:40 +0000</pubDate>
-<description>A long time passed between development of the previous screenshots and the ones I'll show here; I think it was about a month or so. A quick summary of the additions would be:
-
+<description>A long time passed between development of the previous screenshots and the ones I'll show here; I think it was about a month or so. A quick summary of the additions would be:
+
+
+
 * The game is now hosted in</description>
 </item>
 <item>
@@ -184,10 +199,14 @@ I use {TinyBlog|T</description>
 <link>http://donw.org/b/?d=2012-11-30-12-30-01</link>
 <guid>http://donw.org/b/?d=2012-11-30-12-30-01</guid>
 <pubDate>Fri, 30 Nov 2012 12:30:01 +0000</pubDate>
-<description>Before we head into December, I figured I'd show you some screenshots from the progress I made prior to the scope of this all going a bit crazy :)
-
-Here's a quick shot of the Editing Room at that point:
-
+<description>Before we head into December, I figured I'd show you some screenshots from the progress I made prior to the scope of this all going a bit crazy :)
+
+
+
+Here's a quick shot of the Editing Room at that point:
+
+
+
 </description>
 </item>
 <item>
@@ -202,10 +221,14 @@ Here's a quick shot of the Editing Room at that point:
 <link>http://donw.org/b/?d=2012-12-12-19-20-54</link>
 <guid>http://donw.org/b/?d=2012-12-12-19-20-54</guid>
 <pubDate>Wed, 12 Dec 2012 19:20:54 +0000</pubDate>
-<description>In a previous post I hinted at my next decision: is the game set on an island? I think from the title of this post, you can guess that it isn't :)
-
-== Let's Render Planets! ==
-
+<description>In a previous post I hinted at my next decision: is the game set on an island? I think from the title of this post, you can guess that it isn't :)
+
+
+
+== Let's Render Planets! ==
+
+
+
 The noise generatio</description>
 </item>
 <item>
@@ -262,8 +285,10 @@ The noise generatio</description>
 <link>http://donw.org/b/?d=2013-11-20-14-12-52</link>
 <guid>http://donw.org/b/?d=2013-11-20-14-12-52</guid>
 <pubDate>Wed, 20 Nov 2013 14:12:52 +0000</pubDate>
-<description>This blog has been a bit silent of late due to some pretty amazing news we received late last year: we were expecting our first baby! Well, the little bundle of joy has arrived...
-
+<description>This blog has been a bit silent of late due to some pretty amazing news we received late last year: we were expecting our first baby! Well, the little bundle of joy has arrived...
+
+
+
 ||{{http://farm8.staticflickr.com/741</description>
 </item>
 <item>
@@ -271,8 +296,10 @@ The noise generatio</description>
 <link>http://donw.org/b/?d=2014-03-07-15-50-00</link>
 <guid>http://donw.org/b/?d=2014-03-07-15-50-00</guid>
 <pubDate>Fri, 07 Mar 2014 15:50:00 +0000</pubDate>
-<description>Let's say you want JSON config files for your app with the following requirements:
-
+<description>Let's say you want JSON config files for your app with the following requirements:
+
+
+
 * Have a main config file commit to source control with local user config files can optionally override any</description>
 </item>
 <item>
@@ -280,7 +307,27 @@ The noise generatio</description>
 <link>http://donw.org/b/?d=2014-05-30-13-56-31</link>
 <guid>http://donw.org/b/?d=2014-05-30-13-56-31</guid>
 <pubDate>Fri, 30 May 2014 13:56:31 +0100</pubDate>
-<description>{Fable Heroes|http://marketplace.xbox.com/en-gb/Product/Fable-Heroes/66acd000-77fe-1000-9115-d80258410b86} was created as the result of {our|https://www.youtube.com/watch?v=SkK54N2WKQI&t=0m15s} Lionhead </description>
+<description>{Fable Heroes|http://marketplace.xbox.com/en-gb/Product/Fable-Heroes/66acd000-77fe-1000-9115-d80258410b86} was created as the result of our Lionhead </description>
+</item>
+<item>
+<title>Hacking MSVC RTTI: Dynamic Type Discovery with clRefect</title>
+<link>http://donw.org/b/?d=2014-06-24-17-06-45</link>
+<guid>http://donw.org/b/?d=2014-06-24-17-06-45</guid>
+<pubDate>Tue, 24 Jun 2014 17:06:45 +0100</pubDate>
+<description>In this post I'll discuss various **GetType** implementations for {clReflect|clReflect}, highlighting why I don't believe any solution should be a part of the core API. The challenge is easily </description>
+</item>
+<item>
+<title>Reflection in C++ Articles</title>
+<link>http://donw.org/b/?d=2014-09-02-10-42-05</link>
+<guid>http://donw.org/b/?d=2014-09-02-10-42-05</guid>
+<pubDate>Tue, 02 Sep 2014 10:42:05 +0100</pubDate>
+<description>Here's a mirror of my old reflection articles from AltDevBlogADay:
+
+
+
+* {Reflection in C++, Part 1: Introduction|AltDevReflection1}
+
+* {Reflection in C++, Part2: The Simple Implementation of Splinter Cell|AltDevReflectionS</description>
 </item>
 </channel>
 </rss>

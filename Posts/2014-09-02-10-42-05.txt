@@ -1,0 +1,10 @@
+<<Reflection in C++ Articles>>
+
+Here's a mirror of my old reflection articles from AltDevBlogADay:
+
+* {Reflection in C++, Part 1: Introduction|AltDevReflection1}
+* {Reflection in C++, Part2: The Simple Implementation of Splinter Cell|AltDevReflectionSC}
+
+Part 3 was close to completion but never released. However, there's a few clues here and there as to how you can view the draft on this blog :)
+
+[disqus][/disqus]
