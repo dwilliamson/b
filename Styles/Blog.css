@@ -110,6 +110,16 @@ h1
 	border-color:#AAA;
 }
 
+.code-span
+{
+	font-family:"Courier New";
+	background-color:#DDD;
+	border-style:solid;
+	border-width:1px;
+	border-color:#AAA;
+	padding: 0 3px 0 3px;
+}
+
 /* Syntax highlighting descriptors for a code block */
 .code .keyword
 {
