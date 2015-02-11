@@ -105,6 +105,10 @@ function BlogEngine()
 			parser.parse();
 			post_div.set_html(parser.html);
 
+			// Tell mathjax to format the math on this newly loaded page when its ready
+			if ("MathJax" in window)
+				MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+
 			// Notify the caller that the post has displayed
 			if (post_callback)
 				post_callback(post_div)

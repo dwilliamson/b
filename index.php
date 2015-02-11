@@ -17,6 +17,7 @@
 
 		<script language="javascript" src="Code/Extern/dygraph-combined.jgz"></script>
 		<script language="javascript" src="Code/Min/TinyBlog.jgz"></script>
+		<script language="javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_HTMLorMML-full"></script>
 
 		<script type="text/javascript">
 			// Setup global disqus variables
@@ -29,7 +30,7 @@
 			GenerateBlogPostArray("blog_posts");
 		?>
 
-		<script language="javascript">
+		<script type="text/javascript">
 
 			// Set an initial history state so that popstate can ignore the call on page load
 			if (window.history.replaceState)
@@ -73,7 +74,7 @@
 				// The browser changes the title automatically, so reevaluate parameters and diplay posts
 				if (e.state)
 					display_posts();
-			}
+			};
 
 		</script>
 
